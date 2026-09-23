@@ -1,0 +1,39 @@
+# ==========================================
+# PromptShield Backend .gitignore
+# ==========================================
+
+# Environment variables
+.env
+*.env
+!*.env.example
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Large Model Weights (>100MB limit for GitHub)
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+
+# ML Datasets, Checkpoints & Benchmark Logs (>50MB/100MB)
+ml/checkpoints/
+ml/datasets/
+ml/results/
+*.csv
+
+# Virtual Environments
+.venv/
+env/
+venv/

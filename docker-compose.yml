@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: promptshield-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=PromptShield
+      - APP_VERSION=1.0.0
+      - MODEL_PATH=/app/ml/models/promptshield-distilbert-v2
+      - RISK_ALLOW_THRESHOLD=30
+      - RISK_BLOCK_THRESHOLD=70
+      - FRONTEND_URL=http://localhost:5173
+    volumes:
+      - ./backend/ml/models:/app/ml/models:ro

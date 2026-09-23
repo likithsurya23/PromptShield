@@ -1,0 +1,74 @@
+# ==========================================
+# PromptShield Root .gitignore
+# ==========================================
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets
+.env
+*.env
+*.env.local
+.env.*.local
+!backend/.env.example
+
+# Node.js & Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Python & Caching
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Large ML Weights & Checkpoints (>100MB breaks GitHub push)
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+backend/ml/checkpoints/
+ml/checkpoints/
+
+# Large Raw Datasets & Benchmark Evaluation Results (>50MB/100MB)
+backend/ml/datasets/
+ml/datasets/
+backend/ml/results/
+ml/results/
+*.csv
+
+# Operating System & IDEs
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

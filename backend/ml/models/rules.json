@@ -1,0 +1,44 @@
+{
+    "Direct Injection": [
+        "ignore\\s+(all\\s+)?previous\\s+instructions",
+        "ignore\\s+(all\\s+)?prior\\s+instructions",
+        "forget\\s+(all\\s+)?previous\\s+instructions",
+        "disregard\\s+(all\\s+)?previous\\s+instructions"
+    ],
+    "System Prompt Extraction": [
+        "reveal\\s+(your\\s+)?system\\s+prompt",
+        "show\\s+(me\\s+)?your\\s+system\\s+prompt",
+        "reveal\\s+your\\s+hidden\\s+instructions",
+        "show\\s+your\\s+hidden\\s+instructions",
+        "print\\s+your\\s+system\\s+message",
+        "reveal\\s+your\\s+hidden\\s+system\\s+prompt",
+        "reveal\\s+the\\s+hidden\\s+system\\s+prompt",
+        "show\\s+your\\s+hidden\\s+system\\s+prompt",
+        "show\\s+me\\s+your\\s+hidden\\s+system\\s+prompt",
+        "tell\\s+me\\s+your\\s+system\\s+prompt"
+    ],
+    "Jailbreak": [
+        "\\bdan\\b",
+        "do\\s+anything\\s+now",
+        "unrestricted\\s+ai",
+        "unrestricted\\s+assistant",
+        "no\\s+(safety|content)\\s+restrictions"
+    ],
+    "Role Manipulation": [
+        "you\\s+are\\s+now\\s+an?\\s+unrestricted",
+        "act\\s+as\\s+an?\\s+unrestricted",
+        "pretend\\s+you\\s+have\\s+no\\s+safety"
+    ],
+    "Safety Bypass": [
+        "ignore\\s+your\\s+safety",
+        "bypass\\s+(your\\s+)?safety",
+        "disable\\s+(your\\s+)?safety",
+        "ignore\\s+all\\s+safety"
+    ],
+    "Instruction Override": [
+        "override\\s+your\\s+(previous\\s+)?instructions",
+        "follow\\s+my\\s+instructions\\s+instead",
+        "replace\\s+your\\s+(current\\s+)?instructions",
+        "disregard\\s+the\\s+system\\s+message"
+    ]
+}
