@@ -5,7 +5,19 @@ import { Card } from '@/components/ui/Card';
 import { FileText, ShieldCheck, ShieldAlert, Target } from 'lucide-react';
 
 export function ScanResultsOverview({ results }) {
-  if (!results) return null;
+  if (!results) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-center items-center text-center min-h-[220px]">
+        <div className="w-10 h-10 rounded-xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-500 mb-2">
+          <FileText className="w-5 h-5" />
+        </div>
+        <h3 className="text-xs font-semibold text-slate-300 mb-1">Awaiting Document Scan</h3>
+        <p className="text-[11px] text-slate-500 max-w-xs">
+          Select and scan a document to view total chunks, safe count, and threat metrics.
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">

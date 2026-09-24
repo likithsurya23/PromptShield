@@ -54,7 +54,14 @@ export function AttackCategoriesTable({ categories = [], onViewAll }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/40 text-xs">
-              {categories.map((row) => (
+              {categories.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-12 text-center text-slate-500">
+                    No simulation results yet. Run a simulation to populate category metrics.
+                  </td>
+                </tr>
+              ) : (
+                categories.map((row) => (
                 <tr key={row.id} className="hover:bg-slate-800/30 transition-colors">
                   {/* Category Name & Icon */}
                   <td className="py-2.5 text-slate-200">
@@ -106,7 +113,7 @@ export function AttackCategoriesTable({ categories = [], onViewAll }) {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

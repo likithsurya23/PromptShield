@@ -25,7 +25,12 @@ export function ScheduledReportsCard({
         </div>
 
         <div className="space-y-3">
-          {scheduledList.map((item) => (
+          {(!scheduledList || scheduledList.length === 0) ? (
+            <div className="py-8 text-center text-slate-500 text-xs">
+              No scheduled reports configured.
+            </div>
+          ) : (
+            scheduledList.map((item) => (
             <div
               key={item.id}
               className="flex items-center justify-between p-3 rounded-xl bg-[#080d19]/80 border border-slate-800/80 hover:border-slate-700 transition-colors"
@@ -60,7 +65,7 @@ export function ScheduledReportsCard({
                 />
               </button>
             </div>
-          ))}
+          )))}
         </div>
       </div>
     </Card>

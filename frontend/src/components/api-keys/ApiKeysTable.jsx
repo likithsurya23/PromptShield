@@ -8,11 +8,7 @@ import {
   Edit2,
   Trash2,
   Check,
-  Bot,
-  Flame,
-  Zap,
-  Sparkles,
-  Layers,
+  Bot
 } from 'lucide-react';
 
 export function ApiKeysTable({
@@ -113,7 +109,14 @@ export function ApiKeysTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
-              {filteredKeys.map((item) => (
+              {filteredKeys.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="py-12 text-center text-slate-500">
+                    No API keys created yet. Generate a key using the form on the left to integrate PromptShield.
+                  </td>
+                </tr>
+              ) : (
+                filteredKeys.map((item) => (
                 <tr
                   key={item.id}
                   className="hover:bg-slate-800/30 transition-colors group"
@@ -200,7 +203,7 @@ export function ApiKeysTable({
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

@@ -9,13 +9,17 @@ export function ScanSourcesCard({ sourcesData }) {
   const circumference = 2 * Math.PI * radius;
 
   const segments = React.useMemo(() => {
-    let acc = 0;
-    return sourcesData.map((item) => {
+    const result = [];
+    let currentAcc = 0;
+    const items = sourcesData || [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
       const strokeDasharray = `${(item.percentage / 100) * circumference} ${circumference}`;
-      const strokeDashoffset = `-${(acc / 100) * circumference}`;
-      acc += item.percentage;
-      return { ...item, strokeDasharray, strokeDashoffset };
-    });
+      const strokeDashoffset = `-${(currentAcc / 100) * circumference}`;
+      currentAcc += item.percentage;
+      result.push({ ...item, strokeDasharray, strokeDashoffset });
+    }
+    return result;
   }, [sourcesData, circumference]);
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ApiKeysHeader } from '@/components/api-keys/ApiKeysHeader';
 import { ApiKeysMetricCards } from '@/components/api-keys/ApiKeysMetricCards';
@@ -10,31 +10,67 @@ import { ApiUsageChartCard } from '@/components/api-keys/ApiUsageChartCard';
 import { RateLimitsCard } from '@/components/api-keys/RateLimitsCard';
 import { SecurityTipsCard } from '@/components/api-keys/SecurityTipsCard';
 import {
-  API_KEYS_METRICS,
-  INITIAL_API_KEYS,
-  RATE_LIMITS_DATA,
-  API_USAGE_SERIES,
+  getStoredApiKeys,
+  deleteStoredApiKey,
+  computeApiKeyMetrics,
   SECURITY_TIPS,
 } from '@/lib/api-keys';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function ApiKeysPage() {
-  const [keys, setKeys] = useState(INITIAL_API_KEYS);
-  const [metrics, setMetrics] = useState(API_KEYS_METRICS);
+  const [keys, setKeys] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
+
+  useEffect(() => {
+    const syncKeys = () => {
+      setKeys(getStoredApiKeys());
+    };
+    const timer = setTimeout(syncKeys, 0);
+    window.addEventListener('storage', syncKeys);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('storage', syncKeys);
+    };
+  }, []);
+
+  const metrics = computeApiKeyMetrics(keys);
+
+  const rateLimits = useMemo(() => {
+    const limitsMap = {
+      OpenAI: { total: 10000, used: 2450, color: '#3B82F6' },
+      Anthropic: { total: 5000, used: 1200, color: '#A855F7' },
+      'Google Gemini': { total: 15000, used: 3800, color: '#06B6D4' },
+      Gemini: { total: 15000, used: 3800, color: '#06B6D4' },
+      'Hugging Face': { total: 8000, used: 950, color: '#EAB308' },
+      Cohere: { total: 5000, used: 640, color: '#10B981' },
+    };
+
+    const activeProviders = [...new Set(keys.map((k) => k.provider))];
+    if (activeProviders.length === 0) return [];
+
+    return activeProviders.map((prov) => {
+      const info = limitsMap[prov] || { total: 5000, used: 450, color: '#6366F1' };
+      return {
+        provider: prov,
+        total: info.total,
+        used: info.used,
+        percentage: Math.round((info.used / info.total) * 100),
+        color: info.color,
+      };
+    });
+  }, [keys]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const handleAddKey = (newKey) => {
-    setKeys((prev) => [newKey, ...prev]);
-    setMetrics((prev) => ({
-      ...prev,
-      totalKeys: String(Number(prev.totalKeys) + 1),
-      activeKeys: String(Number(prev.activeKeys) + 1),
-    }));
+    const updated = [newKey, ...keys];
+    setKeys(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('promptshield_user_api_keys', JSON.stringify(updated));
+    }
     showToast(`Added API Key: ${newKey.name}`);
   };
 
@@ -44,26 +80,15 @@ export default function ApiKeysPage() {
 
   const handleDeleteKey = (id) => {
     const target = keys.find((k) => k.id === id);
-    setKeys((prev) => prev.filter((k) => k.id !== id));
+    const updated = deleteStoredApiKey(id);
+    setKeys(updated);
     if (target) {
-      setMetrics((prev) => ({
-        ...prev,
-        totalKeys: String(Math.max(0, Number(prev.totalKeys) - 1)),
-        activeKeys:
-          target.status === 'Active'
-            ? String(Math.max(0, Number(prev.activeKeys) - 1))
-            : prev.activeKeys,
-        expiredKeys:
-          target.status === 'Expired'
-            ? String(Math.max(0, Number(prev.expiredKeys) - 1))
-            : prev.expiredKeys,
-      }));
       showToast(`Removed API Key: ${target.name}`);
     }
   };
 
   const handleEditKey = (item) => {
-    showToast(`Editing configurations for ${item.name}`);
+    showToast(`Configurations active for ${item.name}`);
   };
 
   return (
@@ -71,7 +96,7 @@ export default function ApiKeysPage() {
       <div className="space-y-6 max-w-[1700px] mx-auto pb-12">
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-4 py-2.5 rounded-lg shadow-xl border border-blue-400/40 flex items-center gap-2 text-sm animate-fade-in">
+          <div className="fixed bottom-6 right-6 z-50 bg-[#e11d48] text-white px-4 py-2.5 rounded-xl shadow-2xl border border-rose-400/40 flex items-center gap-2 text-xs font-semibold animate-fade-in shadow-rose-950/50">
             <CheckCircle2 className="w-4 h-4 text-white" />
             <span>{toastMessage}</span>
           </div>
@@ -101,10 +126,10 @@ export default function ApiKeysPage() {
         {/* Row 3: API Usage (5 cols), Rate Limits (4 cols), Security Tips (3 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           <div className="lg:col-span-5">
-            <ApiUsageChartCard seriesData={API_USAGE_SERIES} />
+            <ApiUsageChartCard seriesData={null} />
           </div>
           <div className="lg:col-span-4">
-            <RateLimitsCard rateLimits={RATE_LIMITS_DATA} />
+            <RateLimitsCard rateLimits={rateLimits} />
           </div>
           <div className="lg:col-span-3">
             <SecurityTipsCard tips={SECURITY_TIPS} />

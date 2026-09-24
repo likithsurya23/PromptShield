@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
 import { ModelSettings } from '@/components/playground/ModelSettings';
@@ -10,8 +10,9 @@ import { SecurityAnalysisCard } from '@/components/playground/SecurityAnalysisCa
 import { LLMResponseCard } from '@/components/playground/LLMResponseCard';
 import { OutputScanCard } from '@/components/playground/OutputScanCard';
 import { ExamplePromptsRow } from '@/components/playground/ExamplePromptsRow';
-import { executePlaygroundPrompt, SAMPLE_RESPONSES } from '@/lib/playground';
-import { BarChart3 } from 'lucide-react';
+import { executePlaygroundPrompt } from '@/lib/playground';
+import { getApiSettings } from '@/lib/settings';
+import { BarChart3, CheckCircle2, RotateCcw } from 'lucide-react';
 
 export default function LLMPlaygroundPage() {
   const [provider, setProvider] = useState('OpenAI');
@@ -22,56 +23,33 @@ export default function LLMPlaygroundPage() {
   const [systemPrompt, setSystemPrompt] = useState(
     'You are a helpful assistant. Provide accurate, harmless and concise responses.'
   );
-  const [userPrompt, setUserPrompt] = useState(
-    'Explain quantum computing in simple terms.'
-  );
-
+  const [userPrompt, setUserPrompt] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Initial wireframe states
-  const [scanResult, setScanResult] = useState({
-    action: 'ALLOW',
-    risk_score: 3.2,
-    ml_confidence: 98.7,
-    prediction: 'benign',
-    attack_categories: [],
-    matched_rules: [],
-  });
+  const [scanResult, setScanResult] = useState(null);
+  const [pipeline, setPipeline] = useState([]);
+  const [response, setResponse] = useState(null);
+  const [latency, setLatency] = useState(null);
+  const [outputSafe, setOutputSafe] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
-  const [pipeline, setPipeline] = useState([
-    {
-      name: 'Input Scanning',
-      desc: 'Prompt analyzed using DistilBERT + rule engine',
-      status: 'Safe',
-      completed: true,
-      color: 'text-emerald-400',
-    },
-    {
-      name: 'Risk Analysis',
-      desc: 'Risk score calculated',
-      status: '3.2',
-      completed: true,
-      color: 'text-emerald-400',
-    },
-    {
-      name: 'Policy Check',
-      desc: 'Below threshold',
-      status: 'Passed',
-      completed: true,
-      color: 'text-emerald-400',
-    },
-    {
-      name: 'Sent to LLM',
-      desc: 'Prompt forwarded to model',
-      status: 'Completed',
-      completed: true,
-      color: 'text-emerald-400',
-    },
-  ]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const apiSettings = getApiSettings();
+      if (apiSettings) {
+        if (apiSettings.defaultProvider) setProvider(apiSettings.defaultProvider);
+        if (apiSettings.defaultModel) setModel(apiSettings.defaultModel);
+        if (apiSettings.temperature !== undefined) setTemperature(apiSettings.temperature);
+        if (apiSettings.maxTokens !== undefined) setMaxTokens(apiSettings.maxTokens);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const [response, setResponse] = useState(SAMPLE_RESPONSES.quantum);
-  const [latency, setLatency] = useState('2.8s');
-  const [outputSafe, setOutputSafe] = useState(true);
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   const handleExecute = async () => {
     if (!userPrompt.trim()) return;
@@ -91,9 +69,18 @@ export default function LLMPlaygroundPage() {
       setPipeline(res.pipeline);
       setResponse(res.response);
       setLatency(res.latency);
-      setOutputSafe(res.outputSafe);
+      setOutputSafe(res.outputScan ? res.outputScan.passed : true);
+
+      if (res.scanResult.action === 'BLOCK') {
+        showToast('Prompt blocked by PromptShield firewall!');
+      } else if (res.scanResult.action === 'WARN') {
+        showToast('Prompt flagged with security warning.');
+      } else {
+        showToast('Prompt evaluated clean and forwarded.');
+      }
     } catch (err) {
       console.error('Playground error:', err);
+      showToast('Error during evaluation: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -103,8 +90,26 @@ export default function LLMPlaygroundPage() {
     setUserPrompt(ex);
   };
 
+  const handleReset = () => {
+    setUserPrompt('');
+    setScanResult(null);
+    setPipeline([]);
+    setResponse(null);
+    setLatency(null);
+    setOutputSafe(null);
+    showToast('Playground cleared.');
+  };
+
   return (
     <AppShell>
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#e11d48] text-white px-4 py-2.5 rounded-xl shadow-2xl border border-rose-400/40 flex items-center gap-2 text-xs font-semibold animate-fade-in shadow-rose-950/50">
+          <CheckCircle2 className="w-4 h-4 text-white" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -112,14 +117,22 @@ export default function LLMPlaygroundPage() {
             LLM Playground
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Test LLM responses with PromptShield security analysis. Your prompts are scanned before being sent to the model.
+            Test LLM prompts with PromptShield multi-layered security analysis and live interception.
           </p>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-300 hover:text-white transition-colors shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+            <span>Reset Playground</span>
+          </button>
+
           <Link
             href="/analytics"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0f172a] border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-200 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
           >
             <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
             <span>View Usage</span>
@@ -130,7 +143,7 @@ export default function LLMPlaygroundPage() {
       {/* Main 3-Column Layout matching wireframe */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Column 1: Model & Prompts */}
-        <div className="lg:col-span-4 flex flex-col">
+        <div className="lg:col-span-4 flex flex-col space-y-4">
           <ModelSettings
             provider={provider}
             setProvider={setProvider}
@@ -164,7 +177,7 @@ export default function LLMPlaygroundPage() {
         </div>
 
         {/* Column 3: LLM Response & Output Security Scan */}
-        <div className="lg:col-span-4 flex flex-col">
+        <div className="lg:col-span-4 flex flex-col space-y-4">
           <LLMResponseCard
             model={model}
             response={response}
@@ -176,7 +189,9 @@ export default function LLMPlaygroundPage() {
       </div>
 
       {/* Bottom Example Prompts Row */}
-      <ExamplePromptsRow onSelectExample={handleSelectExample} />
+      <div className="mt-5">
+        <ExamplePromptsRow onSelectExample={handleSelectExample} />
+      </div>
     </AppShell>
   );
 }

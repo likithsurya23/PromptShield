@@ -16,10 +16,10 @@ export function SecurityTipsCard({ tips }) {
         </div>
 
         <ul className="space-y-2.5 text-xs text-slate-300">
-          {tips.map((tip, idx) => (
+          {(tips || []).map((tip, idx) => (
             <li key={idx} className="flex items-start gap-2 leading-relaxed">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
-              <span>{tip}</span>
+              <span>{typeof tip === 'string' ? tip : `${tip.title ? `${tip.title}: ` : ''}${tip.text || ''}`}</span>
             </li>
           ))}
         </ul>

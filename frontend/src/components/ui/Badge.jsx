@@ -23,7 +23,7 @@ export function CategoryPill({ category, className = '' }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#1e293b]/90 text-indigo-200 border border-indigo-500/20 shadow-xs',
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#240e1e]/90 text-[#fecdd3] border border-rose-500/25 shadow-xs',
         className
       )}
     >

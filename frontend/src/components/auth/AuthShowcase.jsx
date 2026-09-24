@@ -62,29 +62,29 @@ export function AuthShowcase({ mode = 'login' }) {
   const content = isLogin ? loginContent : registerContent;
 
   return (
-    <div className="relative rounded-2xl bg-gradient-to-b from-[#0e172a] via-[#09101f] to-[#060a14] border border-blue-900/40 p-8 flex flex-col justify-between overflow-hidden shadow-2xl h-full min-h-[580px]">
+    <div className="relative rounded-2xl bg-gradient-to-b from-rose-50/70 via-slate-50/50 to-pink-50/40 dark:from-[#150b17] dark:via-[#1a0c1a] dark:to-[#0b080e] border border-rose-200/80 dark:border-[#2c1622] p-8 flex flex-col justify-between overflow-hidden shadow-xl dark:shadow-2xl h-full min-h-[580px] transition-colors duration-300">
       {/* Background Graphic: Mountains & Glowing Neon Stream with Shield */}
       <div className="relative w-full flex flex-col items-center justify-center pt-4 pb-6">
         {/* Glowing aura */}
-        <div className="absolute top-10 w-44 h-44 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-10 w-44 h-44 bg-rose-500/15 dark:bg-rose-600/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* SVG Graphic matching wireframe */}
         <svg
           viewBox="0 0 320 180"
-          className="w-full max-w-[280px] h-auto overflow-visible select-none drop-shadow-2xl"
+          className="w-full max-w-[280px] h-auto overflow-visible select-none drop-shadow-lg dark:drop-shadow-2xl"
         >
           <defs>
             <linearGradient id="mountainGrad1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#1E293B" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#0B1120" stopOpacity="0.95" />
+              <stop offset="0%" stopColor="var(--mountain-top, #26131c)" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="var(--mountain-bottom, #120c15)" stopOpacity="0.95" />
             </linearGradient>
             <linearGradient id="mountainGrad2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#334155" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#0F172A" stopOpacity="0.9" />
+              <stop offset="0%" stopColor="var(--mountain-far-top, #3d1b28)" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="var(--mountain-far-bottom, #180d1a)" stopOpacity="0.9" />
             </linearGradient>
             <linearGradient id="streamGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#2563EB" stopOpacity="0.2" />
+              <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#6a1a24" stopOpacity="0.2" />
             </linearGradient>
             <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="3" result="blur" />
@@ -118,26 +118,26 @@ export function AuthShowcase({ mode = 'login' }) {
           {/* Glowing Shield Emblem in Center */}
           <g transform="translate(136, 25)">
             {/* Outer glow ring */}
-            <circle cx="24" cy="28" r="32" fill="#3B82F6" opacity="0.15" />
+            <circle cx="24" cy="28" r="32" fill="#e11d48" opacity="0.15" />
             {/* Outer Shield */}
             <path
               d="M 24 2 C 38 2 48 10 48 10 C 48 32 36 50 24 56 C 12 50 0 32 0 10 C 0 10 10 2 24 2 Z"
-              fill="#0F172A"
-              stroke="#38BDF8"
+              fill="#140c17"
+              stroke="#f57b83"
               strokeWidth="2"
               filter="url(#neonGlow)"
             />
             {/* Inner Shield Accent */}
             <path
               d="M 24 10 C 33 10 39 16 39 16 C 39 30 30 42 24 46 C 18 42 9 30 9 16 C 9 16 15 10 24 10 Z"
-              fill="#1D4ED8"
+              fill="#881337"
               opacity="0.4"
             />
             {/* Shield Center Icon */}
             <path
               d="M 24 16 L 24 38 M 16 26 L 24 18 L 32 26"
               fill="none"
-              stroke="#60A5FA"
+              stroke="#fecdd3"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -147,10 +147,10 @@ export function AuthShowcase({ mode = 'login' }) {
 
         {/* Title and Tags */}
         <div className="text-center mt-3">
-          <h2 className="text-xl font-bold text-white tracking-tight">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
             {content.title}
           </h2>
-          <p className="text-xs text-blue-400/90 font-medium tracking-wide mt-1">
+          <p className="text-xs text-rose-600 dark:text-[#f57b83] font-medium tracking-wide mt-1">
             {content.tags}
           </p>
         </div>
@@ -162,14 +162,14 @@ export function AuthShowcase({ mode = 'login' }) {
           const Icon = item.icon;
           return (
             <div key={idx} className="flex items-start gap-3.5">
-              <div className="p-2 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 shrink-0 mt-0.5 shadow-sm shadow-blue-900/20">
+              <div className="p-2 rounded-xl bg-rose-600/10 border border-rose-500/25 text-rose-600 dark:text-[#f57b83] shrink-0 mt-0.5 shadow-sm">
                 <Icon className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-slate-100">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-100">
                   {item.title}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                   {item.desc}
                 </span>
               </div>
@@ -179,8 +179,8 @@ export function AuthShowcase({ mode = 'login' }) {
       </div>
 
       {/* Quote at Bottom */}
-      <div className="pt-6 border-t border-slate-800/80 text-center">
-        <p className="text-xs italic text-slate-400">
+      <div className="pt-6 border-t border-slate-200 dark:border-[#26131c] text-center">
+        <p className="text-xs italic text-slate-600 dark:text-slate-400">
           {content.quote}
         </p>
       </div>

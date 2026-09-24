@@ -4,7 +4,19 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 
 export function ReportsOverTimeCard({ data }) {
-  const [hoveredIdx, setHoveredIdx] = useState(3); // Default on Sep 18 like wireframe
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-center items-center text-center h-full min-h-[220px]">
+        <h2 className="text-sm font-bold text-white tracking-tight mb-2 self-start">Reports Generated Over Time</h2>
+        <div className="py-6 flex flex-col items-center">
+          <p className="text-xs text-slate-500">No report timeline data available.</p>
+          <p className="text-[11px] text-slate-600 mt-1">Audit generation activity over time will be graphed here.</p>
+        </div>
+      </Card>
+    );
+  }
 
   const width = 500;
   const height = 180;
@@ -15,13 +27,14 @@ export function ReportsOverTimeCard({ data }) {
 
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
-  const maxY = 20;
+  const maxY = Math.max(10, ...data.map(d => d.count || 0));
 
   const getY = (val) => {
     return height - paddingBottom - (val / maxY) * chartHeight;
   };
 
   const getX = (idx) => {
+    if (data.length <= 1) return paddingLeft + chartWidth / 2;
     return paddingLeft + (idx / (data.length - 1)) * chartWidth;
   };
 

@@ -57,7 +57,12 @@ export function RateLimitsCard({ rateLimits }) {
         </div>
 
         <div className="space-y-4">
-          {rateLimits.map((item) => (
+          {(!rateLimits || rateLimits.length === 0) ? (
+            <div className="py-8 text-center text-slate-500 text-xs">
+              No active rate limits monitored. Connect API keys to track usage thresholds.
+            </div>
+          ) : (
+            rateLimits.map((item) => (
             <div key={item.provider} className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
@@ -87,7 +92,7 @@ export function RateLimitsCard({ rateLimits }) {
                 />
               </div>
             </div>
-          ))}
+          )))}
         </div>
       </div>
     </Card>

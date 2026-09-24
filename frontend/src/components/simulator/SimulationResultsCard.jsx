@@ -2,10 +2,26 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { Shield, ShieldAlert, AlertTriangle, Target } from 'lucide-react';
+import { Shield, AlertTriangle, Target } from 'lucide-react';
 
 export function SimulationResultsCard({ data }) {
-  if (!data) return null;
+  if (!data) {
+    return (
+      <Card className="p-6 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-center items-center text-center min-h-[320px]">
+        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 shadow-lg shadow-blue-500/5">
+          <Target className="w-7 h-7" />
+        </div>
+        <h3 className="text-base font-semibold text-white mb-1.5">Simulation Standby</h3>
+        <p className="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
+          Configure attack parameters on the left and click &quot;Run Simulation&quot; to test your DistilBERT model against live adversarial prompts.
+        </p>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
+          <span className="w-2 h-2 rounded-full bg-slate-600"></span>
+          Awaiting execution
+        </div>
+      </Card>
+    );
+  }
 
   // SVG Radial Donut calculation
   const radius = 45;

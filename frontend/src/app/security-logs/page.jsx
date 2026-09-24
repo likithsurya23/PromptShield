@@ -1,35 +1,48 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
 import { LogsMetricCards } from '@/components/logs/LogsMetricCards';
 import { LogsFilterBar } from '@/components/logs/LogsFilterBar';
 import { LogsTable } from '@/components/logs/LogsTable';
 import { LogDetailsCard } from '@/components/logs/LogDetailsCard';
 import {
-  MOCK_SECURITY_LOGS,
-  SECURITY_METRICS,
+  FILTER_OPTIONS,
   fetchLiveLogs,
   fetchLiveMetrics,
 } from '@/lib/logs';
-import { Download,CheckCircle2 } from 'lucide-react';
+import { Download, CheckCircle2, Shield, List, RefreshCw } from 'lucide-react';
 
 export default function SecurityLogsPage() {
-  const [metrics, setMetrics] = useState(SECURITY_METRICS);
-  const [logs, setLogs] = useState(MOCK_SECURITY_LOGS);
-  const [selectedLog, setSelectedLog] = useState(MOCK_SECURITY_LOGS[0]);
+  const [metrics, setMetrics] = useState({
+    totalScans: '0',
+    totalScansChange: 'No operations yet',
+    allowed: '0',
+    allowedPercentage: '0%',
+    warned: '0',
+    warnedPercentage: '0%',
+    blocked: '0',
+    blockedPercentage: '0%',
+  });
+  const [logs, setLogs] = useState([]);
+  const [selectedLog, setSelectedLog] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     Promise.allSettled([fetchLiveLogs(), fetchLiveMetrics()]).then(([logsRes, metricsRes]) => {
       if (!mounted) return;
-      if (logsRes.status === 'fulfilled' && logsRes.value?.length) {
+      if (logsRes.status === 'fulfilled' && Array.isArray(logsRes.value)) {
         setLogs(logsRes.value);
-        setSelectedLog(logsRes.value[0]);
+        if (logsRes.value.length > 0) {
+          setSelectedLog(logsRes.value[0]);
+        }
       }
       if (metricsRes.status === 'fulfilled' && metricsRes.value) {
         setMetrics(metricsRes.value);
       }
+      setLoading(false);
     });
     return () => {
       mounted = false;
@@ -74,19 +87,15 @@ export default function SecurityLogsPage() {
   // Filtered logs
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
-      // Status filter
       if (activeFilters.status !== 'All' && log.result !== activeFilters.status) {
         return false;
       }
-      // Category filter
       if (activeFilters.category !== 'All' && log.category !== activeFilters.category) {
         return false;
       }
-      // Source filter
       if (activeFilters.source !== 'All' && log.source !== activeFilters.source) {
         return false;
       }
-      // Search query filter
       if (activeFilters.search.trim()) {
         const query = activeFilters.search.toLowerCase();
         const matchesPrompt = log.prompt && log.prompt.toLowerCase().includes(query);
@@ -101,95 +110,147 @@ export default function SecurityLogsPage() {
     });
   }, [logs, activeFilters]);
 
-  // Export logs simulation
-  const handleExportLogs = () => {
+  const handleExport = () => {
+    if (logs.length === 0) {
+      showToast('No logs available to export.');
+      return;
+    }
     const dataStr =
       'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(filteredLogs, null, 2));
+      encodeURIComponent(JSON.stringify(logs, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute(
       'download',
-      `security-logs-${new Date().toISOString().slice(0, 10)}.json`
+      `promptshield-security-logs-${new Date().toISOString().slice(0, 10)}.json`
     );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showToast(`Exported ${filteredLogs.length} security log entries.`);
+    showToast('Exported audit logs successfully.');
+  };
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const [logsRes, metricsRes] = await Promise.allSettled([
+        fetchLiveLogs(),
+        fetchLiveMetrics(),
+      ]);
+      if (logsRes.status === 'fulfilled' && Array.isArray(logsRes.value)) {
+        setLogs(logsRes.value);
+        if (logsRes.value.length > 0 && !selectedLog) {
+          setSelectedLog(logsRes.value[0]);
+        }
+      }
+      if (metricsRes.status === 'fulfilled' && metricsRes.value) {
+        setMetrics(metricsRes.value);
+      }
+      showToast('Security logs refreshed from API.');
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
     <AppShell>
-      <div className="space-y-6 max-w-[1700px] mx-auto pb-12">
-        {/* Toast Alert */}
-        {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-4 py-2.5 rounded-lg shadow-xl border border-blue-400/40 flex items-center gap-2 text-sm animate-fade-in">
-            <CheckCircle2 className="w-4 h-4 text-white" />
-            <span>{toastMessage}</span>
-          </div>
-        )}
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83] backdrop-blur-md shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <CheckCircle2 className="w-4 h-4 text-[#f57b83]" />
+          <span className="text-xs font-medium">{toastMessage}</span>
+        </div>
+      )}
 
-        {/* Header section matching Wireframe */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2.5 mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
-              <h1 className="text-xl font-bold text-white tracking-tight">
-                Security Logs
-              </h1>
-            </div>
-            <p className="text-xs text-slate-400">
-              Audit trail, real-time threat intelligence, and detailed prompt scan records.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleExportLogs}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98]"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export Logs</span>
-            </button>
-          </div>
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Security Logs</h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Complete audit trail of all prompt scans, threat detections, and model enforcement actions.
+          </p>
         </div>
 
-        {/* 4 KPI Metric Cards */}
-        <LogsMetricCards metrics={metrics} />
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-[#f57b83] ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
 
-        {/* Filter Bar */}
-        <LogsFilterBar
-          filters={filters}
-          setFilters={setFilters}
-          onApply={handleApply}
-          onReset={handleReset}
-        />
-
-        {/* Split Layout: Table (Left 8 cols) & Details (Right 4 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-8">
-            <LogsTable
-              logs={filteredLogs}
-              selectedLogId={selectedLog?.id}
-              onSelectLog={(log) => setSelectedLog(log)}
-            />
-          </div>
-
-          <div className="lg:col-span-4 sticky top-6">
-            <LogDetailsCard
-              log={selectedLog}
-              onActionClick={(action, log) => {
-                if (action === 'allowlist') {
-                  showToast(`Rule added: Signature for ${log.id} has been allowlisted.`);
-                } else if (action === 'analysis') {
-                  showToast(`Opening deep diagnostic report for ${log.id}...`);
-                }
-              }}
-            />
-          </div>
+          <button
+            onClick={handleExport}
+            disabled={logs.length === 0}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-400" />
+            <span>Export Logs (JSON)</span>
+          </button>
         </div>
       </div>
+
+      {loading ? (
+        <div className="rounded-2xl border border-[#2c1622] bg-[#120a14]/85 p-16 text-center shadow-xl mb-6">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-[#1a0e1c] border border-rose-500/30 flex items-center justify-center text-[#f57b83] mb-4">
+            <RefreshCw className="w-6 h-6 animate-spin" />
+          </div>
+          <h2 className="text-base font-semibold text-white mb-1">Loading Security Logs...</h2>
+          <p className="text-xs text-slate-400">Fetching live audit stream from PromptShield API.</p>
+        </div>
+      ) : logs.length === 0 ? (
+        <div className="rounded-2xl border border-[#2c1622] bg-[#120a14]/85 p-12 text-center shadow-xl">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-[#1a0e1c] border border-rose-500/30 flex items-center justify-center text-[#f57b83] mb-4">
+            <List className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">No security logs yet.</h2>
+          <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
+            Run a scan to generate your first security event. All evaluated prompts and inspection telemetry will appear here.
+          </p>
+          <Link
+            href="/prompt-scanner"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white font-semibold text-sm shadow-lg shadow-rose-950/40 transition-all cursor-pointer"
+          >
+            <Shield className="w-4 h-4" />
+            <span>Scan a Prompt</span>
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Top 4 Stat Metric Cards */}
+          <LogsMetricCards metrics={metrics} />
+
+          {/* Filter Bar */}
+          <LogsFilterBar
+            filters={filters}
+            setFilters={setFilters}
+            options={FILTER_OPTIONS}
+            onApply={handleApply}
+            onReset={handleReset}
+          />
+
+          {/* 2-Column Main Section: Logs Table (Left) + Details Card (Right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <div className="lg:col-span-8">
+              <LogsTable
+                logs={filteredLogs}
+                selectedLog={selectedLog}
+                onSelectLog={setSelectedLog}
+              />
+            </div>
+            <div className="lg:col-span-4 sticky top-6">
+              <LogDetailsCard
+                log={selectedLog || filteredLogs[0]}
+                onExport={handleExport}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </AppShell>
   );
 }

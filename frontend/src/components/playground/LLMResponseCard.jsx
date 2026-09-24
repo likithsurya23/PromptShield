@@ -57,16 +57,21 @@ export function LLMResponseCard({
         </div>
 
         {/* Response Body */}
-        <div className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap selection:bg-blue-600/30">
-          {loading ? (
-            <div className="flex items-center justify-center py-16 text-slate-500 gap-2">
-              <span className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <span>Generating LLM response...</span>
-            </div>
-          ) : (
-            response
-          )}
-        </div>
+        {loading ? (
+          <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+            <span className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-2" />
+            <span className="text-xs">Processing prompt through PromptShield firewall...</span>
+          </div>
+        ) : !response ? (
+          <div className="py-12 flex flex-col items-center justify-center text-slate-500 text-center">
+            <p className="text-xs">No response generated yet.</p>
+            <p className="text-[11px] text-slate-600 mt-1">Prompt responses and firewall interception notices will be displayed here.</p>
+          </div>
+        ) : (
+          <div className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap selection:bg-blue-600/30">
+            {response}
+          </div>
+        )}
       </div>
     </Card>
   );

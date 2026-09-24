@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Plus, Eye, EyeOff, Sparkles, ChevronDown } from 'lucide-react';
+import { Plus, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { PROVIDERS } from '@/lib/api-keys';
 
 export function CreateApiKeyForm({ onAddKey }) {
@@ -34,8 +34,8 @@ export function CreateApiKeyForm({ onAddKey }) {
           : environment === 'Development'
           ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
           : 'bg-teal-500/20 text-teal-400 border border-teal-500/30',
-      createdOn: 'Sep 22, 2026',
-      lastUsed: 'Just now',
+      createdOn: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      lastUsed: 'Never',
       status: 'Active',
       statusColor: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
       purpose: purpose.trim() || 'Prompt scanning & protection',

@@ -2,10 +2,55 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { Clock, ShieldAlert, CheckCircle2, AlertTriangle, Skull } from 'lucide-react';
+import { Clock, ShieldAlert, CheckCircle2, AlertTriangle, ShieldCheck, RefreshCw, Skull } from 'lucide-react';
 
-export function ScannerResult({ result }) {
-  if (!result) return null;
+export function ScannerResult({ result, loading, error }) {
+  if (loading) {
+    return (
+      <Card className="flex flex-col items-center justify-center p-8 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl min-h-[360px] text-center">
+        <div className="w-12 h-12 rounded-2xl bg-[#1a0e1c] border border-rose-500/30 flex items-center justify-center mb-4">
+          <RefreshCw className="w-6 h-6 text-[#f57b83] animate-spin" />
+        </div>
+        <h3 className="text-base font-semibold text-white mb-1">Scanning in Progress...</h3>
+        <p className="text-xs text-slate-400 max-w-sm">
+          DistilBERT V2 PyTorch model and pattern matching engine are analyzing tokens for injection and extraction vectors.
+        </p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="flex flex-col items-center justify-center p-8 h-full border-rose-900/40 bg-[#1e0a14]/50 shadow-xl min-h-[360px] text-center">
+        <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mb-4">
+          <AlertTriangle className="w-6 h-6 text-rose-400" />
+        </div>
+        <h3 className="text-base font-semibold text-white mb-1">Inference Service Unavailable</h3>
+        <p className="text-xs text-rose-300/80 max-w-sm mb-3">{error}</p>
+        <p className="text-[11px] text-slate-400">
+          Ensure FastAPI backend is running on <code className="text-[#f57b83]">http://localhost:8000</code>
+        </p>
+      </Card>
+    );
+  }
+
+  if (!result) {
+    return (
+      <Card className="flex flex-col items-center justify-center p-8 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl min-h-[360px] text-center">
+        <div className="w-12 h-12 rounded-2xl bg-[#1a0e1c] border border-rose-500/30 flex items-center justify-center mb-4 text-[#f57b83]">
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-semibold text-white mb-1">Ready for Prompt Scan</h3>
+        <p className="text-xs text-slate-400 max-w-sm mb-4">
+          Type or paste a prompt in the input box and click <span className="text-[#f57b83] font-medium">Scan Prompt</span> to run live ML injection analysis.
+        </p>
+        <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono bg-[#140c17] px-3 py-1.5 rounded-lg border border-[#2c1622]">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Security Engine Online (DistilBERT V2)</span>
+        </div>
+      </Card>
+    );
+  }
 
   const isBlock = result.action === 'BLOCK';
   const isWarn = result.action === 'WARN';
@@ -48,7 +93,7 @@ export function ScannerResult({ result }) {
   const BannerIcon = banner.icon;
 
   return (
-    <Card className="flex flex-col justify-between p-6 h-full border-slate-800/80 bg-[#0c1222]/80 shadow-xl">
+    <Card className="flex flex-col justify-between p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
       <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -80,7 +125,7 @@ export function ScannerResult({ result }) {
         {/* 4 Metric Tiles in a Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {/* 1. Risk Score */}
-          <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-xl bg-[#140c17] border border-[#2c1622] flex flex-col justify-between">
             <span className="text-[11px] text-slate-400">Risk Score</span>
             <div className="my-1">
               <span className="text-lg font-bold text-white font-mono">
@@ -88,10 +133,10 @@ export function ScannerResult({ result }) {
               </span>
               <span className="text-[11px] text-slate-400 font-mono"> / 100</span>
             </div>
-            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-[#1e0a14] rounded-full h-1.5 overflow-hidden">
               <div
                 className={`h-full rounded-full ${
-                  isBlock ? 'bg-rose-500' : isWarn ? 'bg-amber-500' : 'bg-emerald-500'
+                  isBlock ? 'bg-[#f43f5e]' : isWarn ? 'bg-amber-500' : 'bg-emerald-500'
                 }`}
                 style={{ width: `${Math.min(result.risk_score, 100)}%` }}
               />
@@ -99,7 +144,7 @@ export function ScannerResult({ result }) {
           </div>
 
           {/* 2. ML Confidence */}
-          <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-xl bg-[#140c17] border border-[#2c1622] flex flex-col justify-between">
             <span className="text-[11px] text-slate-400">ML Confidence</span>
             <div className="text-lg font-bold text-white font-mono my-1">
               {result.ml_confidence}%
@@ -111,13 +156,13 @@ export function ScannerResult({ result }) {
           </div>
 
           {/* 3. Action */}
-          <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-xl bg-[#140c17] border border-[#2c1622] flex flex-col justify-between">
             <span className="text-[11px] text-slate-400">Action</span>
             <div className="my-auto py-1">
               <span
                 className={`inline-block text-center font-bold text-xs px-3 py-1.5 rounded-lg w-full tracking-wider ${
                   isBlock
-                    ? 'bg-rose-500 text-white shadow-sm shadow-rose-900/40'
+                    ? 'bg-[#f43f5e] text-white shadow-sm shadow-rose-900/40'
                     : isWarn
                     ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-900/40'
                     : 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-900/40'
@@ -130,13 +175,13 @@ export function ScannerResult({ result }) {
           </div>
 
           {/* 4. Prediction */}
-          <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-xl bg-[#140c17] border border-[#2c1622] flex flex-col justify-between">
             <span className="text-[11px] text-slate-400">Prediction</span>
             <div className="my-auto py-1 flex items-center gap-1.5">
               {result.prediction === 'malicious' ? (
                 <>
-                  <Skull className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span className="text-xs font-bold text-rose-400">Malicious</span>
+                  <Skull className="w-4 h-4 text-[#f43f5e] shrink-0" />
+                  <span className="text-xs font-bold text-[#f57b83]">Malicious</span>
                 </>
               ) : (
                 <>
@@ -152,7 +197,7 @@ export function ScannerResult({ result }) {
         {/* Attack Categories & Matched Rules Panels */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Attack Categories */}
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#140c17] border border-[#2c1622]">
             <span className="text-xs font-semibold text-white block mb-2.5">
               Attack Categories
             </span>
@@ -161,7 +206,7 @@ export function ScannerResult({ result }) {
                 result.attack_categories.map((cat, i) => (
                   <span
                     key={i}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/30"
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[#240e1e] text-[#fecdd3] border border-rose-500/30"
                   >
                     {cat}
                   </span>
@@ -173,7 +218,7 @@ export function ScannerResult({ result }) {
           </div>
 
           {/* Matched Rules */}
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#140c17] border border-[#2c1622]">
             <span className="text-xs font-semibold text-white block mb-2">
               Matched Rules
             </span>

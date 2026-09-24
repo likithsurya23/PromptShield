@@ -1,8 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #060a12;
-  --foreground: #f8fafc;
+  --background: #0b080e;
+  --foreground: #fdf2f4;
+  --card-bg: #120c15;
+  --card-border: #26131c;
+  --card-shadow: 0 4px 20px -2px rgba(106, 26, 36, 0.25);
+  --btn-secondary-bg: #160d1b;
+  --btn-secondary-border: #2c1622;
+  --btn-secondary-text: #fecdd3;
+  --btn-secondary-hover-bg: #26131c;
+  --btn-secondary-hover-text: #ffffff;
+  --input-bg: #140c17;
+  --input-border: #2c1622;
+  --input-text: #ffffff;
+  --sidebar: #0e0912;
+  --sidebar-foreground: #fdf2f4;
+  --sidebar-border: rgba(44, 22, 34, 0.8);
+  --sidebar-accent: #190f1d;
+  --sidebar-accent-foreground: #ffffff;
+  --mountain-top: #26131c;
+  --mountain-bottom: #120c15;
+  --mountain-far-top: #3d1b28;
+  --mountain-far-bottom: #180d1a;
 }
 
 body {
@@ -10,6 +30,17 @@ body {
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+
+.bg-sidebar {
+  background-color: var(--sidebar);
+}
+.text-sidebar-foreground {
+  color: var(--sidebar-foreground);
+}
+.border-sidebar-border {
+  border-color: var(--sidebar-border);
 }
 
 /* Custom Sleek Scrollbar */
@@ -19,14 +50,529 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #080d19;
+  background: #0b080e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #2c1622;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #6a1a24;
 }
+
+/* ==========================================================================
+   LIGHT THEME ADAPTABILITY SYSTEM
+   ========================================================================== */
+
+html.light-theme {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-border: #cbd5e1;
+  --btn-secondary-text: #334155;
+  --btn-secondary-hover-bg: #f1f5f9;
+  --btn-secondary-hover-text: #0f172a;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --mountain-top: #93c5fd;
+  --mountain-bottom: #dbeafe;
+  --mountain-far-top: #bfdbfe;
+  --mountain-far-bottom: #eff6ff;
+}
+
+html.light-theme ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html.light-theme ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+html.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+html.light-theme body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Shell & Layout Backgrounds */
+html.light-theme .bg-\[\#060a12\] {
+  background-color: #f1f5f9 !important;
+}
+
+html.light-theme aside {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+  box-shadow: 1px 0 10px rgba(0, 0, 0, 0.02);
+}
+
+html.light-theme header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* Navigation Links in Sidebar */
+html.light-theme aside nav a:not(.bg-\[\#1d4ed8\]):not(.bg-blue-600) {
+  color: #475569 !important;
+}
+
+html.light-theme aside nav a:not(.bg-\[\#1d4ed8\]):not(.bg-blue-600):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light-theme aside nav a.bg-\[\#1d4ed8\],
+html.light-theme aside nav a.bg-blue-600 {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+html.light-theme aside nav a.bg-\[\#1d4ed8\] svg,
+html.light-theme aside nav a.bg-blue-600 svg,
+html.light-theme aside nav a.bg-\[\#1d4ed8\] span,
+html.light-theme aside nav a.bg-blue-600 span {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Sidebar Upgrade Card */
+html.light-theme aside .bg-gradient-to-b {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Search Bar in Header */
+html.light-theme header .bg-\[\#0e1626\] {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+html.light-theme header .bg-\[\#0e1626\]:hover {
+  border-color: #cbd5e1 !important;
+}
+
+html.light-theme header kbd {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+/* ==========================================================================
+   CARDS & CONTAINERS
+   ========================================================================== */
+
+/* Main Card Containers */
+html.light-theme .card-component,
+html.light-theme .bg-\[\#0c1222\],
+html.light-theme .bg-\[\#0c1222\]\/80,
+html.light-theme .bg-\[\#0c1222\]\/70,
+html.light-theme .bg-\[\#0c1222\]\/90,
+html.light-theme .bg-\[\#0f172a\],
+html.light-theme .bg-\[\#0f172a\]\/70,
+html.light-theme .bg-\[\#0f172a\]\/80,
+html.light-theme .bg-\[\#0f172a\]\/90,
+html.light-theme .bg-slate-900,
+html.light-theme .bg-slate-900\/80,
+html.light-theme .bg-slate-900\/60,
+html.light-theme .bg-slate-950 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Inset Wells, Sub-cards, and Row Panels */
+html.light-theme .bg-\[\#080d19\],
+html.light-theme .bg-\[\#080d19\]\/80,
+html.light-theme .bg-\[\#080d19\]\/60,
+html.light-theme .bg-\[\#080d1a\],
+html.light-theme .bg-\[\#0e1626\],
+html.light-theme .bg-\[\#0e1626\]\/80,
+html.light-theme .bg-\[\#090e1c\],
+html.light-theme .bg-\[\#090e1a\],
+html.light-theme .bg-\[\#0d1527\],
+html.light-theme .bg-\[\#111c35\],
+html.light-theme .bg-\[\#131b2e\],
+html.light-theme .bg-\[\#162035\],
+html.light-theme .bg-\[\#172238\],
+html.light-theme .bg-\[\#1a233b\],
+html.light-theme div.bg-slate-900\/90,
+html.light-theme div.bg-slate-900\/60,
+html.light-theme div.bg-slate-900\/80,
+html.light-theme div.bg-slate-900\/50 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Inactive Toggle Switches */
+html.light-theme div.bg-slate-800 {
+  background-color: #cbd5e1 !important;
+}
+
+/* Status Banners in Light Mode */
+html.light-theme .bg-rose-950\/20,
+html.light-theme .bg-rose-950\/10 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+html.light-theme .bg-amber-950\/20,
+html.light-theme .bg-amber-950\/10 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+html.light-theme .bg-emerald-950\/20,
+html.light-theme .bg-emerald-950\/10 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+/* Category Pills & Badges */
+html.light-theme .bg-\[\#1e293b\]\/90,
+html.light-theme .bg-\[\#1e293b\] {
+  background-color: #eef2ff !important;
+  color: #4338ca !important;
+  border-color: #c7d2fe !important;
+}
+
+/* Borders */
+html.light-theme .border-slate-800,
+html.light-theme .border-slate-800\/80,
+html.light-theme .border-slate-800\/60,
+html.light-theme .border-slate-800\/50,
+html.light-theme .border-slate-800\/40,
+html.light-theme .border-slate-700,
+html.light-theme .border-slate-700\/80,
+html.light-theme .border-slate-700\/60,
+html.light-theme .border-slate-700\/50,
+html.light-theme .border-slate-600,
+html.light-theme .divide-slate-800,
+html.light-theme .divide-slate-800\/80,
+html.light-theme .divide-slate-800\/60,
+html.light-theme .divide-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   BUTTONS (SECONDARY, OUTLINE, GHOST & PRIMARY)
+   ========================================================================== */
+
+/* Secondary & Action Buttons */
+html.light-theme button[class*="bg-[#080d19]"],
+html.light-theme button[class*="bg-[#0f172a]"],
+html.light-theme button[class*="bg-slate-900"],
+html.light-theme button[class*="bg-slate-800"],
+html.light-theme a[class*="bg-[#080d19]"],
+html.light-theme a[class*="bg-[#0f172a]"],
+html.light-theme a[class*="bg-slate-900"],
+html.light-theme a[class*="bg-slate-800"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light-theme button[class*="bg-[#080d19]"]:hover,
+html.light-theme button[class*="bg-[#0f172a]"]:hover,
+html.light-theme button[class*="bg-slate-900"]:hover,
+html.light-theme button[class*="bg-slate-800"]:hover,
+html.light-theme a[class*="bg-[#080d19]"]:hover,
+html.light-theme a[class*="bg-[#0f172a]"]:hover,
+html.light-theme a[class*="bg-slate-900"]:hover,
+html.light-theme a[class*="bg-slate-800"]:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* Ghost / Icon Hover */
+html.light-theme .hover\:bg-slate-800\/60:hover,
+html.light-theme .hover\:bg-slate-800\/50:hover,
+html.light-theme .hover\:bg-slate-800\/40:hover,
+html.light-theme .hover\:bg-slate-800\/30:hover,
+html.light-theme .hover\:bg-slate-800:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Active / Selected Pills & Option Toggles */
+html.light-theme .bg-blue-600\/15 {
+  background-color: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #2563eb !important;
+}
+
+/* Primary Action Buttons (Preserve Crisp Vibrant Color & White Text) */
+html.light-theme .bg-blue-600,
+html.light-theme .bg-blue-500,
+html.light-theme .bg-indigo-600,
+html.light-theme .bg-indigo-500,
+html.light-theme .bg-cyan-600,
+html.light-theme .bg-cyan-500,
+html.light-theme .bg-rose-600,
+html.light-theme .bg-rose-500,
+html.light-theme .bg-red-600,
+html.light-theme .bg-red-500,
+html.light-theme .bg-emerald-600,
+html.light-theme .bg-emerald-500,
+html.light-theme .bg-\[\#1d4ed8\],
+html.light-theme .bg-\[\#ef4444\],
+html.light-theme [class*="bg-gradient-to-"] {
+  color: #ffffff !important;
+}
+
+html.light-theme .bg-blue-600 *,
+html.light-theme .bg-blue-500 *,
+html.light-theme .bg-indigo-600 *,
+html.light-theme .bg-indigo-500 *,
+html.light-theme .bg-cyan-600 *,
+html.light-theme .bg-cyan-500 *,
+html.light-theme .bg-rose-600 *,
+html.light-theme .bg-rose-500 *,
+html.light-theme .bg-red-600 *,
+html.light-theme .bg-red-500 *,
+html.light-theme .bg-emerald-600 *,
+html.light-theme .bg-emerald-500 *,
+html.light-theme .bg-\[\#1d4ed8\] *,
+html.light-theme .bg-\[\#ef4444\] *,
+html.light-theme [class*="bg-gradient-to-"] * {
+  color: #ffffff !important;
+}
+
+html.light-theme .bg-blue-600 svg,
+html.light-theme .bg-blue-500 svg,
+html.light-theme .bg-indigo-600 svg,
+html.light-theme .bg-cyan-600 svg,
+html.light-theme .bg-rose-600 svg,
+html.light-theme .bg-red-600 svg,
+html.light-theme .bg-emerald-600 svg {
+  stroke: #ffffff !important;
+}
+
+/* Danger Soft Button */
+html.light-theme .bg-rose-500\/10,
+html.light-theme .bg-rose-500\/15,
+html.light-theme .bg-red-500\/10,
+html.light-theme .bg-red-500\/20 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+}
+
+/* ==========================================================================
+   INPUTS, FORMS & SELECTS
+   ========================================================================== */
+
+html.light-theme input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.bg-transparent),
+html.light-theme textarea:not(.bg-transparent),
+html.light-theme select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light-theme input.bg-transparent {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #0f172a !important;
+}
+
+html.light-theme input:focus,
+html.light-theme textarea:focus,
+html.light-theme select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  outline: none !important;
+}
+
+html.light-theme input::placeholder,
+html.light-theme textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light-theme option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Sliders */
+html.light-theme input[type="range"] {
+  accent-color: #2563eb;
+}
+
+/* Checkboxes & Switches */
+html.light-theme input[type="checkbox"]:checked {
+  background-color: #2563eb !important;
+}
+
+/* High-contrast status accents in Light Mode */
+html.light-theme .text-blue-400 {
+  color: #2563eb !important;
+}
+html.light-theme .text-emerald-400 {
+  color: #059669 !important;
+}
+html.light-theme .text-amber-400 {
+  color: #d97706 !important;
+}
+html.light-theme .text-rose-400 {
+  color: #e11d48 !important;
+}
+html.light-theme .text-purple-400 {
+  color: #9333ea !important;
+}
+html.light-theme .text-indigo-400 {
+  color: #4f46e5 !important;
+}
+
+/* ==========================================================================
+   TEXT CONTRAST & TYPOGRAPHY
+   ========================================================================== */
+
+html.light-theme h1,
+html.light-theme h2,
+html.light-theme h3,
+html.light-theme h4,
+html.light-theme h5,
+html.light-theme h6 {
+  color: #0f172a !important;
+}
+
+/* Text elements not inside colored primary badges */
+html.light-theme .text-white:not(.bg-blue-600):not(.bg-blue-500):not(.bg-indigo-600):not(.bg-rose-600):not(.bg-red-600):not(.bg-emerald-600):not(.bg-\[\#ef4444\]) {
+  color: #0f172a !important;
+}
+
+html.light-theme .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html.light-theme .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light-theme .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light-theme .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light-theme .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+   TABLES, LISTS & CODE BLOCKS
+   ========================================================================== */
+
+html.light-theme table {
+  color: #0f172a !important;
+}
+
+html.light-theme thead,
+html.light-theme th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light-theme tbody tr {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light-theme tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+html.light-theme pre,
+html.light-theme code:not(.bg-blue-600) {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Modals & Popovers Backdrop */
+html.light-theme .bg-black\/80,
+html.light-theme .bg-black\/70,
+html.light-theme .bg-black\/60 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Modal and Dropdown Surfaces */
+html.light-theme .shadow-2xl {
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* ==========================================================================
+   LAYOUT DENSITY PREFERENCES
+   ========================================================================== */
+
+html[data-layout="compact"] main {
+  padding: 1.25rem !important;
+}
+
+html[data-layout="compact"] .space-y-6 {
+  row-gap: 0.85rem !important;
+}
+
+html[data-layout="compact"] .gap-6 {
+  gap: 0.85rem !important;
+}
+
+html[data-layout="compact"] .p-5 {
+  padding: 0.95rem !important;
+}
+
+/* ==========================================================================
+   WCAG 2.1/2.2 ACCESSIBILITY: PREFERS-REDUCED-MOTION SUPPORT
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Prevent continuous CSS keyframe animations for motion-sensitive users */
+  .animate-spin,
+  .animate-ping,
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  canvas {
+    transition: none !important;
+  }
+}
+
+/* Allow landing page cybersecurity network animation to cover entire background */
+.landing-page-root section {
+  background-color: transparent !important;
+}
+

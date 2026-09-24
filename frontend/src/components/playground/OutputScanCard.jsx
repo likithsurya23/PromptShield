@@ -4,7 +4,20 @@ import React from 'react';
 import { Card } from '@/components/ui/Card';
 import { ShieldCheck, ShieldAlert, ArrowRight } from 'lucide-react';
 
-export function OutputScanCard({ isSafe = true }) {
+export function OutputScanCard({ isSafe = null }) {
+  if (isSafe === null) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl">
+        <h2 className="text-sm font-semibold text-white mb-2">
+          6. Output Security Scan
+        </h2>
+        <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-500 text-xs">
+          Awaiting execution. Output will be evaluated post-generation.
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl">
       <h2 className="text-sm font-semibold text-white mb-3">

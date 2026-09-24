@@ -5,6 +5,21 @@ import { Card } from '@/components/ui/Card';
 
 export function ApiUsageChartCard({ seriesData }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+
+  if (!seriesData || !seriesData.dates || seriesData.dates.length === 0) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-center items-center text-center h-full min-h-[220px]">
+        <div className="w-10 h-10 rounded-xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-500 mb-2">
+          <span className="font-mono text-xs">API</span>
+        </div>
+        <h3 className="text-xs font-semibold text-slate-300 mb-1">No API Usage Data</h3>
+        <p className="text-[11px] text-slate-500 max-w-xs">
+          Requests through PromptShield SDK or proxy will display provider volume and throughput here.
+        </p>
+      </Card>
+    );
+  }
+
   const { dates, openai, anthropic, gemini, huggingface } = seriesData;
 
   const width = 500;
@@ -23,6 +38,7 @@ export function ApiUsageChartCard({ seriesData }) {
   };
 
   const getX = (idx) => {
+    if (!dates || dates.length <= 1) return paddingLeft + chartWidth / 2;
     return paddingLeft + (idx / (dates.length - 1)) * chartWidth;
   };
 

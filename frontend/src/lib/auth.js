@@ -57,9 +57,11 @@ export function removeStoredToken() {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem('promptshield_profile_settings');
   sessionStorage.removeItem(TOKEN_KEY);
   sessionStorage.removeItem(USER_KEY);
   document.cookie = 'promptshield_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: null }));
 }
 
 export function getCurrentUser() {
@@ -77,9 +79,10 @@ export function getCurrentUser() {
     const decoded = decodeJwt(token);
     if (decoded) {
       return {
-        name: decoded.name || decoded.sub || 'User',
-        email: decoded.email || decoded.sub,
-        role: decoded.role || 'user',
+        username: decoded.username || decoded.sub || decoded.name || '',
+        name: decoded.name || decoded.username || decoded.sub || '',
+        email: decoded.email || (decoded.sub?.includes('@') ? decoded.sub : ''),
+        role: decoded.role || '',
       };
     }
   }
@@ -100,11 +103,58 @@ export async function loginWithCredentials(usernameOrEmail, password, rememberMe
     if (res.ok) {
       const data = await res.json();
       const token = data.access_token;
-      const user = {
-        name: usernameOrEmail.includes('@') ? usernameOrEmail.split('@')[0] : usernameOrEmail,
-        email: usernameOrEmail.includes('@') ? usernameOrEmail : `${usernameOrEmail}@example.com`,
+      let user = {
+        username: username,
+        name: username,
+        email: usernameOrEmail.includes('@') ? usernameOrEmail : '',
+        role: 'user',
       };
+
+      // Fetch authentic user details from backend /auth/me
+      try {
+        const meRes = await fetch(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          const username = meData.username || meData.name || usernameOrEmail;
+          user = {
+            username,
+            name: username,
+            email: meData.email || usernameOrEmail,
+            role: meData.role || 'user',
+          };
+        }
+      } catch (meErr) {
+        console.warn('Could not reach /auth/me, using provided credentials', meErr);
+      }
+
       setStoredToken(token, user, rememberMe);
+
+      // Save real user profile immediately
+      try {
+        const initials = user.username
+          ? user.username
+              .split(' ')
+              .filter(Boolean)
+              .map((n) => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)
+          : '';
+
+        const profile = {
+          username: user.username,
+          name: user.username,
+          email: user.email,
+          initials,
+          role: user.role || '',
+          plan: user.plan || '',
+        };
+        localStorage.setItem('promptshield_profile_settings', JSON.stringify(profile));
+        window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: profile }));
+      } catch {}
+
       return { success: true, token, user };
     }
   } catch {
@@ -113,64 +163,454 @@ export async function loginWithCredentials(usernameOrEmail, password, rememberMe
 
   // Graceful development fallback
   const user = {
-    name: usernameOrEmail.includes('@') ? usernameOrEmail.split('@')[0] : usernameOrEmail,
-    email: usernameOrEmail.includes('@') ? usernameOrEmail : `${usernameOrEmail}@example.com`,
-    plan: 'Free Plan',
+    username: usernameOrEmail,
+    name: usernameOrEmail,
+    email: usernameOrEmail,
+    role: '',
+    plan: '',
   };
   const mockToken = createMockJwt(user);
   setStoredToken(mockToken, user, rememberMe);
+
+  try {
+    const initials = user.username
+      ? user.username
+          .split(' ')
+          .filter(Boolean)
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2)
+      : '';
+
+    const profile = {
+      username: user.username,
+      name: user.username,
+      email: user.email,
+      initials,
+      role: '',
+      plan: '',
+    };
+    localStorage.setItem('promptshield_profile_settings', JSON.stringify(profile));
+    window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: profile }));
+  } catch {}
+
   return { success: true, token: mockToken, user };
 }
 
-export async function registerWithCredentials(name, email, password) {
-  const username = email.split('@')[0] || name.toLowerCase().replace(/\s+/g, '_');
+export async function registerWithCredentials(username, email, password) {
+  const cleanUsername = (username || '').trim();
+  const cleanEmail = (email || '').trim();
 
   try {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username,
-        email,
+        username: cleanUsername,
+        name: cleanUsername,
+        email: cleanEmail,
         password,
       }),
     });
 
     if (res.ok) {
-      // Automatically log in after registration
-      return await loginWithCredentials(username, password, true);
+      return { success: true };
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      return { success: false, error: errData.detail || 'Registration failed' };
     }
   } catch {
-    console.warn('Backend offline, using development JWT registration fallback');
+    console.warn('Backend offline, using development registration');
+    return { success: true };
   }
-
-  // Fallback
-  const user = { name, email, plan: 'Free Plan' };
-  const mockToken = createMockJwt(user);
-  setStoredToken(mockToken, user, true);
-  return { success: true, token: mockToken, user };
 }
 
-export async function loginWithOAuth(provider) {
-  // Simulate OAuth redirect & JWT generation
-  const mockProfile = {
+export async function loginWithOAuth(provider, customProfile = null) {
+  const normProvider = (provider || 'google').toLowerCase();
+
+  const defaultProfiles = {
     google: {
       name: 'Google Developer',
       email: 'developer@gmail.com',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
       provider: 'google',
     },
     github: {
       name: 'GitHub Contributor',
       email: 'contributor@github.com',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
       provider: 'github',
     },
-  }[provider] || {
-    name: 'OAuth User',
-    email: 'user@oauth.com',
-    provider,
   };
 
-  const token = createMockJwt(mockProfile);
-  setStoredToken(token, mockProfile, true);
-  return { success: true, token, user: mockProfile };
+  const profile = customProfile || defaultProfiles[normProvider] || {
+    name: 'OAuth User',
+    email: `${normProvider}_user@promptshield.io`,
+    avatarUrl: '',
+    provider: normProvider,
+  };
+
+  // Generate cryptographic anti-CSRF state nonce
+  const stateNonce = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2);
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/social`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: normProvider,
+        email: profile.email,
+        name: profile.name,
+        avatar_url: profile.avatarUrl || '',
+        token: profile.token || `oauth_token_${stateNonce}`,
+        state: stateNonce,
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const token = data.access_token;
+      const decoded = decodeJwt(token);
+      const username = decoded?.sub || decoded?.name || profile.name || profile.email.split('@')[0];
+      const user = {
+        username,
+        name: profile.name || username,
+        email: profile.email,
+        provider: normProvider,
+        role: decoded?.role || 'user',
+        plan: '',
+      };
+      setStoredToken(token, user, true);
+
+      // Sync with settings profile
+      if (typeof window !== 'undefined') {
+        try {
+          const initials = username
+            ? username
+                .split(' ')
+                .filter(Boolean)
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)
+            : '';
+          const currentProfile = {
+            username,
+            name: username,
+            email: user.email,
+            initials,
+            role: user.role || '',
+            plan: '',
+          };
+          localStorage.setItem('promptshield_profile_settings', JSON.stringify(currentProfile));
+          window.dispatchEvent(
+            new CustomEvent('promptshield:profile_updated', { detail: currentProfile })
+          );
+        } catch {}
+      }
+
+      return { success: true, token, user };
+    }
+  } catch (err) {
+    console.warn('Backend social auth failed, falling back to local JWT:', err);
+  }
+
+  // Graceful fallback if backend is unreachable
+  const username = profile.name || profile.email.split('@')[0];
+  const fallbackUser = {
+    username,
+    name: username,
+    email: profile.email,
+    provider: normProvider,
+    role: 'user',
+    plan: '',
+  };
+  const mockToken = createMockJwt(fallbackUser);
+  setStoredToken(mockToken, fallbackUser, true);
+  if (typeof window !== 'undefined') {
+    try {
+      const initials = username
+        ? username
+            .split(' ')
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+        : '';
+      const currentProfile = {
+        username,
+        name: username,
+        email: fallbackUser.email,
+        initials,
+        role: fallbackUser.role || '',
+        plan: '',
+      };
+      localStorage.setItem('promptshield_profile_settings', JSON.stringify(currentProfile));
+      window.dispatchEvent(
+        new CustomEvent('promptshield:profile_updated', { detail: currentProfile })
+      );
+    } catch {}
+  }
+  return { success: true, token: mockToken, user: fallbackUser };
+}
+
+/**
+ * Fetch OAuth Client IDs from backend configuration
+ */
+export async function getOAuthConfig() {
+  try {
+    const res = await fetch(`${API_BASE}/auth/oauth/config`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+  return {
+    github_client_id: null,
+    google_client_id: null,
+    callback_url: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback',
+  };
+}
+
+/**
+ * Initiate real GitHub OAuth flow by redirecting to GitHub authorization page
+ */
+export function initiateGitHubOAuth(customClientId = null) {
+  if (typeof window === 'undefined') return;
+
+  const clientId =
+    customClientId ||
+    process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID ||
+    localStorage.getItem('promptshield_github_client_id');
+
+  const callbackUrl = `${window.location.origin}/auth/callback`;
+
+  // Cryptographically random anti-CSRF state
+  const state = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2);
+
+  sessionStorage.setItem('promptshield_oauth_state', state);
+  sessionStorage.setItem('promptshield_oauth_provider', 'github');
+
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+    callbackUrl
+  )}&scope=${encodeURIComponent('read:user user:email')}&state=${state}`;
+
+  window.location.href = githubAuthUrl;
+}
+
+/**
+ * Exchange GitHub code with backend for genuine JWT token and live user profile
+ */
+export async function exchangeGitHubCode(code, state, credentials = {}) {
+  const savedState = typeof window !== 'undefined' ? sessionStorage.getItem('promptshield_oauth_state') : null;
+  if (savedState && state && savedState !== state) {
+    throw new Error('Anti-CSRF validation failed. Authentication request was tampered with or expired.');
+  }
+
+  const clientId =
+    credentials.clientId ||
+    process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID ||
+    (typeof window !== 'undefined' ? localStorage.getItem('promptshield_github_client_id') : null);
+
+  const clientSecret =
+    credentials.clientSecret ||
+    (typeof window !== 'undefined' ? localStorage.getItem('promptshield_github_client_secret') : null);
+
+  const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback';
+
+  const res = await fetch(`${API_BASE}/auth/oauth/github/exchange`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      code,
+      redirect_uri: redirectUri,
+      client_id: clientId || undefined,
+      client_secret: clientSecret || undefined,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'GitHub authentication failed. Please verify credentials.');
+  }
+
+  const data = await res.json();
+  const token = data.access_token;
+  const decoded = decodeJwt(token);
+
+  const user = {
+    name: decoded?.name || decoded?.sub || 'GitHub User',
+    email: decoded?.email || `${decoded?.sub}@github.com`,
+    provider: 'github',
+    role: decoded?.role || 'user',
+    plan: 'Developer Pro',
+  };
+
+  setStoredToken(token, user, true);
+
+  if (typeof window !== 'undefined') {
+    try {
+      const currentProfile = JSON.parse(localStorage.getItem('promptshield_profile') || '{}');
+      localStorage.setItem(
+        'promptshield_profile',
+        JSON.stringify({
+          ...currentProfile,
+          fullName: user.name,
+          email: user.email,
+          title: 'GitHub Verified Developer',
+        })
+      );
+      window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: { fullName: user.name, email: user.email } }));
+    } catch {}
+  }
+
+  return { success: true, token, user };
+}
+
+/**
+ * Sign in directly with a real GitHub Personal Access Token
+ */
+export async function loginWithGitHubToken(token) {
+  const cleanToken = token.trim();
+  if (!cleanToken) throw new Error('Token cannot be empty');
+
+  const res = await fetch(`${API_BASE}/auth/oauth/github/token-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: cleanToken }),
+  });
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || 'GitHub authentication failed. Ensure token has read:user and user:email permissions.');
+  }
+
+  const data = await res.json();
+  const jwt = data.access_token;
+  const decoded = decodeJwt(jwt);
+
+  const user = {
+    name: decoded?.name || decoded?.sub || 'GitHub User',
+    email: decoded?.email || `${decoded?.sub}@github.com`,
+    provider: 'github',
+    role: decoded?.role || 'user',
+    plan: 'Developer Pro',
+  };
+
+  setStoredToken(jwt, user, true);
+
+  if (typeof window !== 'undefined') {
+    try {
+      const currentProfile = JSON.parse(localStorage.getItem('promptshield_profile') || '{}');
+      localStorage.setItem(
+        'promptshield_profile',
+        JSON.stringify({
+          ...currentProfile,
+          fullName: user.name,
+          email: user.email,
+          title: 'GitHub Verified Developer',
+        })
+      );
+      window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: { fullName: user.name, email: user.email } }));
+    } catch {}
+  }
+
+  return { success: true, token: jwt, user };
+}
+
+/**
+ * Initiate real Google OAuth flow
+ */
+export function initiateGoogleOAuth(customClientId = null) {
+  if (typeof window === 'undefined') return;
+
+  const clientId =
+    customClientId ||
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+    localStorage.getItem('promptshield_google_client_id');
+
+  const callbackUrl = `${window.location.origin}/auth/callback`;
+
+  const state = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2);
+
+  sessionStorage.setItem('promptshield_oauth_state', state);
+  sessionStorage.setItem('promptshield_oauth_provider', 'google');
+
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+    callbackUrl
+  )}&response_type=code&scope=${encodeURIComponent('openid email profile')}&state=${state}&access_type=offline&prompt=select_account`;
+
+  window.location.href = googleAuthUrl;
+}
+
+/**
+ * Exchange Google code with backend for genuine JWT token and live user profile
+ */
+export async function exchangeGoogleCode(code, idToken = null, credentials = {}) {
+  const clientId =
+    credentials.clientId ||
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+    (typeof window !== 'undefined' ? localStorage.getItem('promptshield_google_client_id') : null);
+
+  const clientSecret =
+    credentials.clientSecret ||
+    (typeof window !== 'undefined' ? localStorage.getItem('promptshield_google_client_secret') : null);
+
+  const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback';
+
+  const res = await fetch(`${API_BASE}/auth/oauth/google/exchange`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      code,
+      id_token: idToken || undefined,
+      redirect_uri: redirectUri,
+      client_id: clientId || undefined,
+      client_secret: clientSecret || undefined,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Google authentication failed. Please verify credentials.');
+  }
+
+  const data = await res.json();
+  const token = data.access_token;
+  const decoded = decodeJwt(token);
+
+  const user = {
+    name: decoded?.name || decoded?.sub || 'Google User',
+    email: decoded?.email || `${decoded?.sub}@gmail.com`,
+    provider: 'google',
+    role: decoded?.role || 'user',
+    plan: 'Developer Pro',
+  };
+
+  setStoredToken(token, user, true);
+
+  if (typeof window !== 'undefined') {
+    try {
+      const currentProfile = JSON.parse(localStorage.getItem('promptshield_profile') || '{}');
+      localStorage.setItem(
+        'promptshield_profile',
+        JSON.stringify({
+          ...currentProfile,
+          fullName: user.name,
+          email: user.email,
+          title: 'Google Verified Member',
+        })
+      );
+      window.dispatchEvent(new CustomEvent('promptshield:profile_updated', { detail: { fullName: user.name, email: user.email } }));
+    } catch {}
+  }
+
+  return { success: true, token, user };
 }

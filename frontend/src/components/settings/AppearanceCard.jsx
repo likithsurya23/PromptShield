@@ -9,7 +9,7 @@ export function AppearanceCard({
   onAppearanceChange,
 }) {
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between">
+    <Card className="p-5 border-[#2c1622] bg-[#120a14]/85 shadow-xl flex flex-col justify-between">
       <div>
         <h2 className="text-sm font-bold text-white tracking-tight">
           Appearance
@@ -39,8 +39,8 @@ export function AppearanceCard({
                   onClick={() => onAppearanceChange('theme', t.id)}
                   className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-sm'
-                      : 'bg-[#080d19] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                      ? 'bg-rose-500/15 border-[#f43f5e] text-[#f57b83] shadow-sm'
+                      : 'bg-[#140c17] border-[#2c1622] text-slate-400 hover:text-white hover:border-rose-500/40'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -81,8 +81,8 @@ export function AppearanceCard({
                   onClick={() => onAppearanceChange('layout', l.id)}
                   className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all text-left cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-sm'
-                      : 'bg-[#080d19] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                      ? 'bg-rose-500/15 border-[#f43f5e] text-[#f57b83] shadow-sm'
+                      : 'bg-[#140c17] border-[#2c1622] text-slate-400 hover:text-white hover:border-rose-500/40'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />

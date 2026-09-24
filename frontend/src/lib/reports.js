@@ -1,18 +1,9 @@
 'use client';
 
-// Top 4 Metrics matching wireframe
-export const REPORTS_METRICS = {
-  totalReports: '24',
-  totalReportsChange: '↑ 20% from last month',
-  scheduledReports: '8',
-  scheduledReportsChange: '↑ 33% from last month',
-  threatReports: '6',
-  threatReportsChange: '↓ 14% from last month',
-  usageReports: '10',
-  usageReportsChange: '↑ 25% from last month',
-};
+const STORAGE_KEY = 'promptshield_generated_reports';
+const SCHEDULES_KEY = 'promptshield_scheduled_reports';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-// Filter dropdown options
 export const REPORTS_FILTER_OPTIONS = {
   reportTypes: [
     'All Reports',
@@ -21,154 +12,156 @@ export const REPORTS_FILTER_OPTIONS = {
     'Model Usage',
     'RAG Security',
     'Attack Simulation',
-    'System',
   ],
   dateRanges: [
-    'Sep 15, 2026 - Sep 21, 2026',
-    'Sep 01, 2026 - Sep 21, 2026',
-    'Aug 21, 2026 - Sep 21, 2026',
-    'Last 30 Days',
-    'Last 90 Days',
+    'Today',
+    'Past 7 Days',
+    'Past 30 Days',
+    'All Time',
   ],
   dataSources: ['All Sources', 'Scanner', 'Playground', 'RAG Security', 'API'],
-  formats: ['PDF', 'CSV', 'JSON'],
+  formats: ['JSON', 'CSV'],
 };
 
-// Reports by Type Donut Data (Total 24)
-export const REPORTS_BY_TYPE = [
-  { name: 'Security Scan Reports', percentage: 37.5, count: 9, color: '#3b82f6' }, // blue
-  { name: 'Threat Analysis Reports', percentage: 25.0, count: 6, color: '#f43f5e' }, // red/rose
-  { name: 'Model Usage Reports', percentage: 16.7, count: 4, color: '#10b981' }, // green/emerald
-  { name: 'RAG Security Reports', percentage: 8.3, count: 2, color: '#a855f7' }, // purple
-  { name: 'Attack Simulation Reports', percentage: 8.3, count: 2, color: '#f59e0b' }, // yellow/amber
-  { name: 'Other', percentage: 4.2, count: 1, color: '#64748b' }, // slate
-];
-
-// Reports Generated Over Time Line Chart Data
-export const REPORTS_OVER_TIME = [
-  { date: 'Sep 15', count: 2 },
-  { date: 'Sep 16', count: 5 },
-  { date: 'Sep 17', count: 5 },
-  { date: 'Sep 18', count: 12 }, // Peak
-  { date: 'Sep 19', count: 8 },
-  { date: 'Sep 20', count: 10 },
-  { date: 'Sep 21', count: 14 },
-];
-
-// Report Status Donut Data
-export const REPORT_STATUS_DATA = [
-  { status: 'Completed', count: 18, percentage: 75.0, color: '#10b981' }, // green
-  { status: 'Generating', count: 2, percentage: 8.3, color: '#3b82f6' }, // blue
-  { status: 'Scheduled', count: 3, percentage: 12.5, color: '#f59e0b' }, // amber
-  { status: 'Failed', count: 1, percentage: 4.2, color: '#ef4444' }, // red
-];
-
-// Initial Recent Reports List (6 items matching wireframe)
-export const INITIAL_RECENT_REPORTS = [
+export const DEFAULT_SCHEDULES = [
   {
-    id: 'rep-1',
-    name: 'Weekly Security Summary',
-    type: 'Security Scan',
-    typeBadge: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-    dateGenerated: 'Sep 21, 2026',
-    status: 'Completed',
-    statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    format: 'PDF',
-    size: '2.4 MB',
-  },
-  {
-    id: 'rep-2',
-    name: 'Prompt Injection Analysis',
-    type: 'Threat Analysis',
-    typeBadge: 'bg-rose-500/15 text-rose-400 border border-rose-500/30',
-    dateGenerated: 'Sep 20, 2026',
-    status: 'Completed',
-    statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    format: 'PDF',
-    size: '3.8 MB',
-  },
-  {
-    id: 'rep-3',
-    name: 'Model Usage Report',
-    type: 'Usage',
-    typeBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    dateGenerated: 'Sep 19, 2026',
-    status: 'Completed',
-    statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    format: 'PDF',
-    size: '1.9 MB',
-  },
-  {
-    id: 'rep-4',
-    name: 'RAG Security Assessment',
-    type: 'RAG Security',
-    typeBadge: 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
-    dateGenerated: 'Sep 18, 2026',
-    status: 'Generating',
-    statusBadge: 'bg-blue-500/20 text-blue-400 border border-blue-500/40 animate-pulse',
-    format: 'PDF',
-    size: 'In progress',
-  },
-  {
-    id: 'rep-5',
-    name: 'Attack Simulation Results',
-    type: 'Attack Simulation',
-    typeBadge: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
-    dateGenerated: 'Sep 17, 2026',
-    status: 'Completed',
-    statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    format: 'PDF',
-    size: '4.2 MB',
-  },
-  {
-    id: 'rep-6',
-    name: 'Monthly Activity Report',
-    type: 'System',
-    typeBadge: 'bg-slate-700/40 text-slate-300 border border-slate-700',
-    dateGenerated: 'Sep 15, 2026',
-    status: 'Failed',
-    statusBadge: 'bg-rose-500/15 text-rose-400 border border-rose-500/30',
-    format: 'PDF',
-    size: '0 KB',
-  },
-];
-
-// Scheduled Reports Data
-export const INITIAL_SCHEDULED_REPORTS = [
-  {
-    id: 'sch-1',
-    name: 'Weekly Security Report',
-    schedule: 'Every Monday, 9:00 AM',
+    id: 'sched-1',
+    name: 'Weekly Threat Intelligence Digest',
+    frequency: 'Weekly on Mondays (08:00 UTC)',
+    format: 'JSON',
+    recipients: 'security-team@promptshield.io',
     enabled: true,
   },
   {
-    id: 'sch-2',
-    name: 'Monthly Usage Report',
-    schedule: '1st of every month',
-    enabled: true,
-  },
-  {
-    id: 'sch-3',
-    name: 'Threat Summary Report',
-    schedule: 'Every Friday, 5:00 PM',
+    id: 'sched-2',
+    name: 'Daily High-Risk Prompt Audit',
+    frequency: 'Daily at 23:59 UTC',
+    format: 'CSV',
+    recipients: 'compliance@promptshield.io',
     enabled: false,
   },
+  {
+    id: 'sched-3',
+    name: 'Monthly Executive Security KPI Report',
+    frequency: '1st of every month',
+    format: 'JSON',
+    recipients: 'ciso@promptshield.io',
+    enabled: true,
+  },
 ];
 
-// Report Insights Data
-export const REPORT_INSIGHTS = [
-  {
-    id: 'ins-1',
-    type: 'trend',
-    title: '20% increase in scans',
-    subtitle: 'Compared to last month',
-    iconColor: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30',
-  },
-  {
-    id: 'ins-2',
-    type: 'threat',
-    title: '14% decrease in threats',
-    subtitle: 'Security measures are improving',
-    iconColor: 'text-rose-400 bg-rose-500/15 border-rose-500/30',
-  },
-];
+export function getStoredReports() {
+  if (typeof window === 'undefined') return [];
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveReport(report) {
+  if (typeof window === 'undefined') return;
+  const current = getStoredReports();
+  const updated = [report, ...current];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  return updated;
+}
+
+export function deleteStoredReport(id) {
+  if (typeof window === 'undefined') return [];
+  const current = getStoredReports();
+  const updated = current.filter((r) => r.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  return updated;
+}
+
+export function getStoredSchedules() {
+  if (typeof window === 'undefined') return DEFAULT_SCHEDULES;
+  const raw = localStorage.getItem(SCHEDULES_KEY);
+  if (!raw) return DEFAULT_SCHEDULES;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return DEFAULT_SCHEDULES;
+  }
+}
+
+export function saveSchedules(schedules) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SCHEDULES_KEY, JSON.stringify(schedules));
+}
+
+export async function generateSecurityReport({
+  name = 'Security Audit Summary',
+  type = 'Security Scan',
+  format = 'JSON',
+  dateRange = 'Past 7 Days',
+}) {
+  let summary = { total_scans: 0, allowed: 0, warned: 0, blocked: 0, top_attack_categories: {} };
+  let scans = [];
+
+  try {
+    const [summaryRes, scansRes] = await Promise.allSettled([
+      fetch(`${API_BASE}/analytics/summary`),
+      fetch(`${API_BASE}/scans?limit=100`),
+    ]);
+    if (summaryRes.status === 'fulfilled' && summaryRes.value.ok) {
+      summary = await summaryRes.value.json();
+    }
+    if (scansRes.status === 'fulfilled' && scansRes.value.ok) {
+      scans = await scansRes.value.json();
+    }
+  } catch {}
+
+  const newReport = {
+    id: `rep-${Date.now().toString(36)}`,
+    name: name || `${type} Report`,
+    type,
+    typeBadge:
+      type === 'Threat Analysis'
+        ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+        : 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
+    dateGenerated: new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+    status: 'Completed',
+    statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
+    format: format || 'JSON',
+    size: `${(Math.max(1, JSON.stringify(scans).length) / 1024).toFixed(1)} KB`,
+    data: {
+      generatedAt: new Date().toISOString(),
+      dateRange,
+      totalScansEvaluated: summary.total_scans || scans.length,
+      allowed: summary.allowed || 0,
+      warned: summary.warned || 0,
+      blocked: summary.blocked || 0,
+      topAttackCategories: summary.top_attack_categories || {},
+      recentScans: scans,
+    },
+  };
+
+  saveReport(newReport);
+  return newReport;
+}
+
+export function computeReportMetrics(reports = [], schedules = []) {
+  const total = reports.length;
+  const threatReports = reports.filter((r) => r.type === 'Threat Analysis').length;
+  const scanReports = reports.filter((r) => r.type === 'Security Scan').length;
+  const activeSchedules = schedules.filter((s) => s.enabled).length;
+
+  return {
+    totalReports: total.toString(),
+    totalReportsChange: total > 0 ? `${total} generated` : 'No reports yet',
+    scheduledReports: activeSchedules.toString(),
+    scheduledReportsChange: `${activeSchedules} active schedules`,
+    threatReports: threatReports.toString(),
+    threatReportsChange: `${threatReports} threat audits`,
+    usageReports: scanReports.toString(),
+    usageReportsChange: `${scanReports} scan audits`,
+  };
+}

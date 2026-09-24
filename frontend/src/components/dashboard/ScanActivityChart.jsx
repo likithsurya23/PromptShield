@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { ChevronDown } from 'lucide-react';
 
 export function ScanActivityChart({ data = [] }) {
-  const [timeframe, setTimeframe] = useState('Last 7 Days');
+  const [timeframe] = useState('Last 7 Days');
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const width = 500;
@@ -18,15 +18,24 @@ export function ScanActivityChart({ data = [] }) {
   const maxY = 400;
 
   const getY = (val) => {
-    return padding.top + chartHeight - (val / maxY) * chartHeight;
+    const num = Number(val) || 0;
+    return padding.top + chartHeight - (num / maxY) * chartHeight;
   };
 
   const getX = (index) => {
+    if (!data || data.length <= 1) {
+      return padding.left + chartWidth / 2;
+    }
     return padding.left + (index / (data.length - 1)) * chartWidth;
   };
 
   const generatePath = (key) => {
-    if (!data.length) return '';
+    if (!data || !data.length) return '';
+    if (data.length === 1) {
+      const x = getX(0);
+      const y = getY(data[0][key]);
+      return `M ${x - 5},${y} L ${x + 5},${y}`;
+    }
     return data.reduce((acc, pt, i) => {
       const x = getX(i);
       const y = getY(pt[key]);
@@ -194,7 +203,12 @@ export function ScanActivityChart({ data = [] }) {
             className="absolute top-2 bg-slate-900/95 border border-slate-700/80 rounded-lg p-2 text-xs shadow-xl pointer-events-none z-10 transition-all"
             style={{
               left: `${Math.min(
-                Math.max((hoveredIndex / (data.length - 1)) * 100, 15),
+                Math.max(
+                  data.length > 1
+                    ? (hoveredIndex / (data.length - 1)) * 100
+                    : 50,
+                  15
+                ),
                 80
               )}%`,
               transform: 'translateX(-50%)',

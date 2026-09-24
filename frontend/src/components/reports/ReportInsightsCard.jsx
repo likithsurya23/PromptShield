@@ -16,8 +16,13 @@ export function ReportInsightsCard({ insights }) {
         </div>
 
         <div className="space-y-3">
-          {insights.map((item) => {
-            const isTrend = item.type === 'trend';
+          {(!insights || insights.length === 0) ? (
+            <div className="py-6 text-center text-slate-500 text-xs">
+              No audit insights yet. Generate security reports to extract automated insights.
+            </div>
+          ) : (
+            insights.map((item) => {
+              const isTrend = item.type === 'trend';
             return (
               <div
                 key={item.id}
@@ -43,7 +48,7 @@ export function ReportInsightsCard({ insights }) {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
     </Card>

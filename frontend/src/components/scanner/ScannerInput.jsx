@@ -28,13 +28,13 @@ export function ScannerInput({
       if (text) {
         setPrompt(text.slice(0, maxLength));
       }
-    } catch (err) {
+    } catch {
       console.warn('Clipboard read permission denied');
     }
   };
 
   return (
-    <Card className="flex flex-col justify-between p-6 h-full border-slate-800/80 bg-[#0c1222]/80 shadow-xl">
+    <Card className="flex flex-col justify-between p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
       <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -42,7 +42,7 @@ export function ScannerInput({
             <h2 className="text-sm font-semibold text-white">1. Enter Your Prompt</h2>
             <div className="group relative">
               <Info className="w-3.5 h-3.5 text-slate-400 hover:text-slate-200 cursor-pointer" />
-              <div className="absolute left-0 bottom-full mb-1 hidden group-hover:block w-56 p-2 bg-slate-900 border border-slate-700 rounded-lg text-[10px] text-slate-300 shadow-xl z-20">
+              <div className="absolute left-0 bottom-full mb-1 hidden group-hover:block w-56 p-2 bg-[#140c17] border border-[#2c1622] rounded-lg text-[10px] text-slate-300 shadow-xl z-20">
                 Input any user prompt, system override, or file text to test for adversarial injection patterns.
               </div>
             </div>
@@ -61,7 +61,7 @@ export function ScannerInput({
             <button
               type="button"
               onClick={handlePaste}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-400 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#f57b83] transition-colors"
             >
               <Clipboard className="w-3.5 h-3.5" />
               <span>Paste</span>
@@ -77,7 +77,7 @@ export function ScannerInput({
             maxLength={maxLength}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Type or paste your prompt here..."
-            className="w-full bg-[#080d1a] border border-slate-800/90 rounded-xl p-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none font-mono leading-relaxed"
+            className="w-full bg-[#140c17] border border-[#2c1622] rounded-xl p-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all resize-none font-mono leading-relaxed"
           />
           <div className="absolute bottom-3 right-3 text-[11px] font-mono text-slate-400 select-none">
             {prompt.length}/{maxLength}
@@ -89,7 +89,7 @@ export function ScannerInput({
           type="button"
           onClick={onScan}
           disabled={loading || !prompt.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-900/40 transition-all disabled:opacity-50 cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -104,7 +104,7 @@ export function ScannerInput({
       </div>
 
       {/* Try an Example */}
-      <div className="mt-6 pt-4 border-t border-slate-800/80">
+      <div className="mt-6 pt-4 border-t border-[#2c1622]">
         <span className="text-xs text-slate-400 block mb-2.5">Try an example:</span>
         <div className="flex flex-wrap gap-2">
           {examples.map((ex, idx) => (
@@ -112,7 +112,7 @@ export function ScannerInput({
               key={idx}
               type="button"
               onClick={() => setPrompt(ex)}
-              className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 hover:bg-blue-600/10 text-slate-300 hover:text-blue-300 transition-all"
+              className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-[#140c17] border border-[#2c1622] hover:border-rose-500/50 hover:bg-[#6a1a24]/20 text-slate-300 hover:text-[#fecdd3] transition-all cursor-pointer"
             >
               {ex}
             </button>

@@ -8,29 +8,39 @@ import { SimulationResultsCard } from '@/components/simulator/SimulationResultsC
 import { AttackCategoriesTable } from '@/components/simulator/AttackCategoriesTable';
 import { DetectionChartCard } from '@/components/simulator/DetectionChartCard';
 import { RecentSimulationLogs } from '@/components/simulator/RecentSimulationLogs';
-import { INITIAL_SIMULATION_DATA, runAttackSimulation } from '@/lib/simulator';
-import { Wrench, BookOpen } from 'lucide-react';
+import { runAttackSimulation } from '@/lib/simulator';
+import { Wrench, BookOpen, Download, CheckCircle2 } from 'lucide-react';
 
 export default function AttackSimulatorPage() {
   const [config, setConfig] = useState({
     attackType: 'Jailbreak',
-    samples: 20,
+    samples: 5,
     difficulty: 'Medium',
     includeObfuscated: true,
     includeMultiTurn: false,
     testOutputScan: true,
   });
 
-  const [data, setData] = useState(INITIAL_SIMULATION_DATA);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   const handleRunSimulation = async () => {
     setLoading(true);
     try {
       const res = await runAttackSimulation(config);
       setData(res);
+      showToast(
+        `Simulation finished: ${res.detected}/${res.totalAttacks} vectors detected (${res.detectionRate}% rate).`
+      );
     } catch (err) {
       console.error('Simulation error:', err);
+      showToast('Simulation failed: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -39,37 +49,72 @@ export default function AttackSimulatorPage() {
   const handleReset = () => {
     setConfig({
       attackType: 'Jailbreak',
-      samples: 20,
+      samples: 5,
       difficulty: 'Medium',
       includeObfuscated: true,
       includeMultiTurn: false,
       testOutputScan: true,
     });
-    setData(INITIAL_SIMULATION_DATA);
+    setData(null);
+    showToast('Attack simulator parameters reset.');
+  };
+
+  const handleExportSimulation = () => {
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `simulation-benchmark-${config.attackType.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded simulation benchmark report.');
   };
 
   return (
     <AppShell>
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#e11d48] text-white px-4 py-2.5 rounded-xl shadow-2xl border border-rose-400/40 flex items-center gap-2 text-xs font-semibold animate-fade-in shadow-rose-950/50">
+          <CheckCircle2 className="w-4 h-4 text-white" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400">
+          <div className="p-2.5 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83]">
             <Wrench className="w-6 h-6" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">
-              Attack Simulator
+              Adversarial Attack Simulator
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
-              Test your security model against various prompt injection attack types.
+              Benchmark PromptShield ML & Rule engines against multi-vector adversarial attack suites.
             </p>
           </div>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2.5">
+          {data && (
+            <button
+              onClick={handleExportSimulation}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#f57b83]" />
+              <span>Export Benchmark</span>
+            </button>
+          )}
+
           <Link
             href="/docs"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0f172a] border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-200 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
           >
             <BookOpen className="w-3.5 h-3.5 text-slate-400" />
             <span>View Documentation</span>
@@ -95,16 +140,17 @@ export default function AttackSimulatorPage() {
 
       {/* Bottom 2-Column Section: Categories & Performance/Logs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        {/* Left Column: Attack Categories Table */}
         <div className="lg:col-span-6">
-          <AttackCategoriesTable categories={data.categories} />
+          <AttackCategoriesTable categories={data?.categories || []} />
         </div>
+        <div className="lg:col-span-6">
+          <DetectionChartCard chartData={data?.chartData || []} />
+        </div>
+      </div>
 
-        {/* Right Column: Stacked Chart & Logs */}
-        <div className="lg:col-span-6 flex flex-col justify-between">
-          <DetectionChartCard data={data.chartData} />
-          <RecentSimulationLogs logs={data.logs} />
-        </div>
+      {/* Simulation Execution Logs Table */}
+      <div className="mt-5">
+        <RecentSimulationLogs logs={data?.logs || []} />
       </div>
     </AppShell>
   );

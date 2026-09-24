@@ -8,15 +8,34 @@ export function ReportStatusCard({ statusData }) {
   const strokeWidth = 20;
   const circumference = 2 * Math.PI * radius;
 
+  const totalReports = React.useMemo(() => {
+    if (!statusData || statusData.length === 0) return 0;
+    return statusData.reduce((acc, item) => acc + (item.count || 0), 0);
+  }, [statusData]);
+
   const segments = React.useMemo(() => {
+    if (!statusData || statusData.length === 0 || totalReports === 0) return [];
     let acc = 0;
     return statusData.map((item) => {
-      const strokeDasharray = `${(item.percentage / 100) * circumference} ${circumference}`;
+      const pct = (item.count / totalReports) * 100;
+      const strokeDasharray = `${(pct / 100) * circumference} ${circumference}`;
       const strokeDashoffset = `-${(acc / 100) * circumference}`;
-      acc += item.percentage;
-      return { ...item, strokeDasharray, strokeDashoffset };
+      acc += pct;
+      return { ...item, strokeDasharray, strokeDashoffset, percentage: Math.round(pct) };
     });
-  }, [statusData, circumference]);
+  }, [statusData, totalReports, circumference]);
+
+  if (!statusData || statusData.length === 0 || totalReports === 0) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-center items-center text-center h-full min-h-[220px]">
+        <h2 className="text-sm font-bold text-white tracking-tight mb-2 self-start">Report Status</h2>
+        <div className="py-6 flex flex-col items-center">
+          <p className="text-xs text-slate-500">No report status data available.</p>
+          <p className="text-[11px] text-slate-600 mt-1">Generate reports to track compilation status.</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">
@@ -48,7 +67,7 @@ export function ReportStatusCard({ statusData }) {
             {/* Centered label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
               <span className="text-base font-extrabold text-white font-mono leading-none">
-                24
+                {totalReports}
               </span>
               <span className="text-[10px] text-slate-400 mt-1">
                 Reports

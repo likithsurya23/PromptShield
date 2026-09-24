@@ -35,7 +35,14 @@ export function RecentSimulationLogs({ logs = [], onViewAll }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/40 text-xs">
-            {logs.map((row) => (
+            {(!logs || logs.length === 0) ? (
+              <tr>
+                <td colSpan="5" className="py-10 text-center text-slate-500">
+                  No simulation logs recorded yet. Run a simulation to inspect live attack vectors.
+                </td>
+              </tr>
+            ) : (
+              logs.map((row) => (
               <tr
                 key={row.id}
                 onClick={() => setSelectedLog(row)}
@@ -67,7 +74,7 @@ export function RecentSimulationLogs({ logs = [], onViewAll }) {
                   {row.riskScore}
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>

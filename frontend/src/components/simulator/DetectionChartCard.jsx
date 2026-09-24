@@ -32,9 +32,15 @@ export function DetectionChartCard({ data = [] }) {
         </div>
       </div>
 
-      <div className="relative w-full overflow-hidden">
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
+      {(!data || data.length === 0) ? (
+        <div className="h-36 flex flex-col items-center justify-center text-center p-4 border border-dashed border-slate-800 rounded-lg">
+          <p className="text-xs text-slate-500">No simulation performance data yet.</p>
+          <p className="text-[11px] text-slate-600 mt-1">Run a simulation above to visualize detection vs missed metrics.</p>
+        </div>
+      ) : (
+        <div className="relative w-full overflow-hidden">
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
           className="w-full h-36 overflow-visible"
           preserveAspectRatio="none"
         >
@@ -66,7 +72,6 @@ export function DetectionChartCard({ data = [] }) {
           {/* Stacked Bars */}
           {data.map((item, idx) => {
             const x = padding.left + idx * (barWidth + barSpacing);
-            const total = item.detected + item.missed;
             const detectedHeight = (item.detected / maxY) * chartHeight;
             const missedHeight = (item.missed / maxY) * chartHeight;
 
@@ -154,6 +159,7 @@ export function DetectionChartCard({ data = [] }) {
           </div>
         )}
       </div>
+      )}
     </Card>
   );
 }

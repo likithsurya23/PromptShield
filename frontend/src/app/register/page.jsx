@@ -1,20 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AuthNavbar } from '@/components/auth/AuthNavbar';
-import { AuthFooter } from '@/components/auth/AuthFooter';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { AuthShowcase } from '@/components/auth/AuthShowcase';
+import { getAppearanceSettings, applyAppearance } from '@/lib/settings';
 
 export default function RegisterPage() {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const saved = getAppearanceSettings();
+      applyAppearance(saved);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#060a12] text-slate-100 flex flex-col justify-between selection:bg-blue-600/30 selection:text-blue-200 antialiased">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b080e] text-slate-900 dark:text-slate-100 flex flex-col justify-between selection:bg-rose-600/30 selection:text-rose-500 dark:selection:text-[#f57b83] antialiased transition-colors duration-300">
       {/* Top Navbar */}
       <AuthNavbar />
 
-      {/* Main Split Container matching wireframe */}
+      {/* Main Split Container */}
       <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-5xl rounded-3xl bg-[#090e1c]/80 border border-slate-800/80 shadow-2xl shadow-black/80 backdrop-blur-xl p-4 sm:p-6 md:p-8">
+        <div className="w-full max-w-5xl rounded-3xl bg-white/95 dark:bg-[#120a14]/85 border border-slate-200/90 dark:border-[#2c1622] shadow-2xl shadow-slate-200/60 dark:shadow-black/80 backdrop-blur-xl p-4 sm:p-6 md:p-8 transition-colors duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* Left Column: Form */}
             <div className="lg:col-span-6 flex flex-col justify-center">
@@ -28,9 +36,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <AuthFooter />
     </div>
   );
 }

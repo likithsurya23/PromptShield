@@ -27,6 +27,7 @@ export function ScanTrendsCard({ trendsData }) {
   };
 
   const getX = (idx) => {
+    if (!labels || labels.length <= 1) return paddingLeft + chartWidth / 2;
     return paddingLeft + (idx / (labels.length - 1)) * chartWidth;
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { ReportsHeader } from '@/components/reports/ReportsHeader';
 import { ReportsFilterBar } from '@/components/reports/ReportsFilterBar';
@@ -12,30 +12,45 @@ import { RecentReportsTable } from '@/components/reports/RecentReportsTable';
 import { ScheduledReportsCard } from '@/components/reports/ScheduledReportsCard';
 import { ReportInsightsCard } from '@/components/reports/ReportInsightsCard';
 import { GenerateReportModal } from '@/components/reports/GenerateReportModal';
+import { ReportDetailModal } from '@/components/reports/ReportDetailModal';
 import {
-  REPORTS_METRICS,
   REPORTS_FILTER_OPTIONS,
-  REPORTS_BY_TYPE,
-  REPORTS_OVER_TIME,
-  REPORT_STATUS_DATA,
-  INITIAL_RECENT_REPORTS,
-  INITIAL_SCHEDULED_REPORTS,
-  REPORT_INSIGHTS,
+  getStoredReports,
+  deleteStoredReport,
+  getStoredSchedules,
+  saveSchedules,
+  generateSecurityReport,
+  computeReportMetrics,
 } from '@/lib/reports';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function ReportsPage() {
-  const [reports, setReports] = useState(INITIAL_RECENT_REPORTS);
-  const [scheduledList, setScheduledList] = useState(INITIAL_SCHEDULED_REPORTS);
+  const [reports, setReports] = useState([]);
+  const [scheduledList, setScheduledList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingReport, setViewingReport] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Load from storage after client mount to prevent SSR hydration mismatch
+  useEffect(() => {
+    const syncReports = () => {
+      setReports(getStoredReports());
+      setScheduledList(getStoredSchedules());
+    };
+    const timer = setTimeout(syncReports, 0);
+    window.addEventListener('storage', syncReports);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('storage', syncReports);
+    };
+  }, []);
 
   // Filter state
   const [filters, setFilters] = useState({
     reportType: 'All Reports',
-    dateRange: 'Sep 15, 2026 - Sep 21, 2026',
+    dateRange: 'Past 7 Days',
     dataSource: 'All Sources',
-    format: 'PDF',
+    format: 'JSON',
   });
 
   const showToast = (msg) => {
@@ -60,64 +75,115 @@ export default function ReportsPage() {
     });
   }, [reports, filters]);
 
+  // Dynamic Metrics
+  const metrics = computeReportMetrics(reports, scheduledList);
+
+  // Dynamic Reports by Type
+  const reportsByType = useMemo(() => {
+    if (reports.length === 0) return [];
+    const types = [
+      'Security Scan',
+      'Threat Analysis',
+      'Model Usage',
+      'RAG Security',
+      'Attack Simulation',
+    ];
+    const colors = ['#3B82F6', '#EF4444', '#10B981', '#8B5CF6', '#F59E0B'];
+    return types
+      .map((t, idx) => ({
+        label: t,
+        count: reports.filter((r) => r.type === t).length,
+        color: colors[idx % colors.length],
+      }))
+      .filter((t) => t.count > 0);
+  }, [reports]);
+
+  // Dynamic Reports over time
+  const reportsOverTime = useMemo(() => {
+    if (reports.length === 0) return [];
+    const grouped = {};
+    reports.forEach((r) => {
+      const d = r.dateGenerated || 'Recent';
+      grouped[d] = (grouped[d] || 0) + 1;
+    });
+    return Object.entries(grouped).map(([date, count]) => ({
+      date,
+      count,
+    }));
+  }, [reports]);
+
+  // Dynamic Report Status
+  const reportStatus = useMemo(() => {
+    if (reports.length === 0) return [];
+    const completed = reports.filter((r) => r.status === 'Completed').length;
+    const pending = reports.filter((r) => r.status !== 'Completed').length;
+    return [
+      { label: 'Completed', count: completed, color: '#10B981' },
+      { label: 'Pending', count: pending, color: '#F59E0B' },
+    ].filter((s) => s.count > 0);
+  }, [reports]);
+
   // Quick report generation from filter bar
-  const handleGenerateQuickReport = () => {
-    const newReport = {
-      id: `rep-${Date.now()}`,
-      name: `${filters.reportType === 'All Reports' ? 'System Overview' : filters.reportType} Report`,
-      type: filters.reportType === 'All Reports' ? 'Security Scan' : filters.reportType,
-      typeBadge: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-      dateGenerated: 'Sep 22, 2026',
-      status: 'Completed',
-      statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-      format: filters.format,
-      size: '2.1 MB',
-    };
-    setReports((prev) => [newReport, ...prev]);
-    showToast(`Generated: ${newReport.name} (${newReport.format})`);
+  const handleGenerateQuickReport = async () => {
+    try {
+      const newReport = await generateSecurityReport({
+        type:
+          filters.reportType === 'All Reports'
+            ? 'Security Scan'
+            : filters.reportType,
+        format: filters.format,
+        dateRange: filters.dateRange,
+      });
+      setReports((prev) => [newReport, ...prev]);
+      showToast(`Generated: ${newReport.name} (${newReport.format})`);
+    } catch (err) {
+      console.error('Failed to generate quick report:', err);
+      showToast('Error generating report.');
+    }
   };
 
   // Toggle scheduled item
   const handleToggleSchedule = (id) => {
-    setScheduledList((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item
-      )
+    const updated = scheduledList.map((item) =>
+      item.id === id ? { ...item, enabled: !item.enabled } : item
     );
-    const updated = scheduledList.find((i) => i.id === id);
-    showToast(
-      `${updated.name} schedule is now ${!updated.enabled ? 'Active' : 'Paused'}.`
-    );
+    setScheduledList(updated);
+    saveSchedules(updated);
+    const target = updated.find((i) => i.id === id);
+    if (target) {
+      showToast(
+        `${target.name} ${target.enabled ? 'activated' : 'paused'}.`
+      );
+    }
   };
 
-  // Download simulation
+  // Download real report content
   const handleDownloadReport = (rep) => {
-    const dummyContent = {
-      reportId: rep.id,
-      title: rep.name,
-      type: rep.type,
-      generated: rep.dateGenerated,
-      format: rep.format,
-      metrics: REPORTS_METRICS,
-    };
     const dataStr =
       'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(dummyContent, null, 2));
+      encodeURIComponent(JSON.stringify(rep.data || rep, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute(
       'download',
-      `${rep.name.toLowerCase().replace(/\s+/g, '-')}.${rep.format.toLowerCase()}`
+      `${rep.name.toLowerCase().replace(/\s+/g, '-')}.${(rep.format || 'json').toLowerCase()}`
     );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showToast(`Downloaded: ${rep.name} (${rep.format})`);
+    showToast(`Downloaded: ${rep.name}`);
   };
 
   // View report details
   const handleViewReport = (rep) => {
-    showToast(`Viewing report details for: ${rep.name}`);
+    setViewingReport(rep);
+  };
+
+  // Delete report
+  const handleDeleteReport = (id) => {
+    const updated = deleteStoredReport(id);
+    setReports(updated);
+    showToast('Report deleted from archive.');
   };
 
   // Created from modal
@@ -131,17 +197,25 @@ export default function ReportsPage() {
       <div className="space-y-6 max-w-[1700px] mx-auto pb-12">
         {/* Toast Alert */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-4 py-2.5 rounded-lg shadow-xl border border-blue-400/40 flex items-center gap-2 text-sm animate-fade-in">
+          <div className="fixed bottom-6 right-6 z-50 bg-[#e11d48] text-white px-4 py-2.5 rounded-xl shadow-2xl border border-rose-400/40 flex items-center gap-2 text-xs font-semibold animate-fade-in shadow-rose-950/50">
             <CheckCircle2 className="w-4 h-4 text-white" />
             <span>{toastMessage}</span>
           </div>
         )}
 
-        {/* Modal */}
+        {/* Generate Report Modal */}
         <GenerateReportModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onCreated={handleReportCreated}
+        />
+
+        {/* View Report Detail Modal */}
+        <ReportDetailModal
+          isOpen={Boolean(viewingReport)}
+          onClose={() => setViewingReport(null)}
+          report={viewingReport}
+          onDownload={handleDownloadReport}
         />
 
         {/* Top Header */}
@@ -156,18 +230,18 @@ export default function ReportsPage() {
         />
 
         {/* Row 1: 4 Metric Cards */}
-        <ReportsMetricCards metrics={REPORTS_METRICS} />
+        <ReportsMetricCards metrics={metrics} />
 
         {/* Row 2: 3 Chart Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           <div className="lg:col-span-4">
-            <ReportsByTypeCard data={REPORTS_BY_TYPE} />
+            <ReportsByTypeCard data={reportsByType} />
           </div>
           <div className="lg:col-span-4">
-            <ReportsOverTimeCard data={REPORTS_OVER_TIME} />
+            <ReportsOverTimeCard data={reportsOverTime} />
           </div>
           <div className="lg:col-span-4">
-            <ReportStatusCard statusData={REPORT_STATUS_DATA} />
+            <ReportStatusCard statusData={reportStatus} />
           </div>
         </div>
 
@@ -179,6 +253,7 @@ export default function ReportsPage() {
               reports={filteredReports}
               onDownloadReport={handleDownloadReport}
               onViewReport={handleViewReport}
+              onDeleteReport={handleDeleteReport}
             />
           </div>
 
@@ -188,7 +263,7 @@ export default function ReportsPage() {
               scheduledList={scheduledList}
               onToggleSchedule={handleToggleSchedule}
             />
-            <ReportInsightsCard insights={REPORT_INSIGHTS} />
+            <ReportInsightsCard insights={[]} />
           </div>
         </div>
       </div>

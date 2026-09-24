@@ -7,8 +7,7 @@ export function RiskScoreDistributionCard({ distribution }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const maxY = 2000;
-  const height = 180;
-  const yTicks = [0, 500, 1000, 1500, 2000];
+  const yTicks = [2000, 1500, 1000, 500, 0];
 
   return (
     <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">

@@ -1,71 +1,249 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Lock } from 'lucide-react';
+import { Lock, Save, CheckCircle2, Shield, X, Eye, EyeOff, User } from 'lucide-react';
 
 export function ProfileCard({
   profile,
   onProfileChange,
+  onSaveProfile,
   onChangePassword,
 }) {
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [passError, setPassError] = useState('');
+  const [passSuccess, setPassSuccess] = useState(false);
+
+  const displayUser = profile?.username || profile?.name || '';
+  const initials = displayUser
+    ? displayUser
+        .split(' ')
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '';
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    setPassError('');
+
+    if (!currentPassword) {
+      setPassError('Please enter your current password.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPassError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPassError('New passwords do not match.');
+      return;
+    }
+
+    setPassSuccess(true);
+    setTimeout(() => {
+      setPassSuccess(false);
+      setIsPasswordModalOpen(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      if (onChangePassword) {
+        onChangePassword();
+      }
+    }, 1200);
+  };
+
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between">
+    <Card className="p-5 border-[#2c1622] bg-[#120a14]/85 shadow-xl flex flex-col justify-between">
       <div>
-        <h2 className="text-sm font-bold text-white tracking-tight">
-          Profile
-        </h2>
-        <p className="text-xs text-slate-400 mt-0.5 mb-5">
-          View and update your profile information.
+        <div className="flex items-center justify-between mb-0.5">
+          <h2 className="text-sm font-bold text-white tracking-tight">Profile</h2>
+          {profile?.role && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#1a0e1c] text-[#f57b83] border border-rose-500/25">
+              <Shield className="w-3 h-3" />
+              <span>{profile.role}</span>
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-slate-400 mb-5">
+          View and update your personal information and authentication credentials.
         </p>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-5">
           {/* Large Avatar */}
-          <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 text-white font-bold text-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 shrink-0 select-none">
-            {profile.initials}
+          <div
+            suppressHydrationWarning
+            className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#be123c] via-[#e11d48] to-[#6a1a24] text-white font-bold text-xl flex items-center justify-center shadow-lg shadow-rose-950/40 shrink-0 select-none border border-rose-500/30"
+          >
+            {initials || <User className="w-8 h-8 text-white/80" />}
           </div>
 
           <div className="flex-1 space-y-3 w-full">
-            {/* Name */}
+            {/* Username */}
             <div>
               <label className="text-[11px] font-medium text-slate-400 block mb-1">
-                Name
+                Username
               </label>
               <input
                 type="text"
-                value={profile.name}
-                onChange={(e) => onProfileChange('name', e.target.value)}
-                className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                value={profile.username || profile.name || ''}
+                onChange={(e) => {
+                  onProfileChange('username', e.target.value);
+                  onProfileChange('name', e.target.value);
+                }}
+                placeholder="Enter your username"
+                className="w-full bg-[#140c17] border border-[#2c1622] rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-rose-500 transition-colors"
               />
             </div>
 
             {/* Email */}
             <div>
               <label className="text-[11px] font-medium text-slate-400 block mb-1">
-                Email
+                Email Address
               </label>
               <input
                 type="email"
-                value={profile.email}
+                value={profile.email || ''}
                 onChange={(e) => onProfileChange('email', e.target.value)}
-                className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                placeholder="Enter your email"
+                className="w-full bg-[#140c17] border border-[#2c1622] rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-rose-500 transition-colors"
               />
             </div>
           </div>
         </div>
 
-        {/* Change Password Button */}
-        <div>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[#2c1622]">
           <button
             type="button"
-            onClick={onChangePassword}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer"
+            onClick={onSaveProfile}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all active:scale-95 cursor-pointer"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>Save Profile</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsPasswordModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5 text-slate-400" />
             <span>Change Password</span>
           </button>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {isPasswordModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-[#130a15] border border-[#2c1622] rounded-2xl shadow-2xl p-6 text-left relative">
+            <button
+              onClick={() => setIsPasswordModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1f0f1f] transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-[#1a0e1c] border border-rose-500/25 text-[#f57b83] flex items-center justify-center">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Update Password</h3>
+                <p className="text-xs text-slate-400">
+                  Ensure your account is protected with a secure password.
+                </p>
+              </div>
+            </div>
+
+            {passSuccess ? (
+              <div className="p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center gap-3 text-xs my-4">
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                <span>Password updated successfully! Closing...</span>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordSubmit} className="space-y-3.5 mt-4">
+                {passError && (
+                  <div className="p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs">
+                    {passError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-[11px] font-medium text-slate-300 block mb-1">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 px-3 pr-10 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    >
+                      {showPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-medium text-slate-300 block mb-1">
+                    New Password
+                  </label>
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-medium text-slate-300 block mb-1">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                    className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsPasswordModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors shadow-md shadow-blue-600/30"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

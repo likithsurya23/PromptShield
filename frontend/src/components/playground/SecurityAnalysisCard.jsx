@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { RotateCw, ShieldCheck, ShieldAlert, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { RotateCw, ShieldCheck, ShieldAlert, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export function SecurityAnalysisCard({
   scanResult,
@@ -10,7 +10,19 @@ export function SecurityAnalysisCard({
   onRescan,
   loading,
 }) {
-  if (!scanResult) return null;
+  if (!scanResult) {
+    return (
+      <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-center items-center text-center min-h-[350px]">
+        <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <h3 className="text-sm font-semibold text-white mb-1">Firewall Inspection Standby</h3>
+        <p className="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
+          Enter a prompt and click &quot;Run Prompt&quot; to inspect real-time DistilBERT inference, risk score, and policy enforcement.
+        </p>
+      </Card>
+    );
+  }
 
   const isBlocked = scanResult.action === 'BLOCK';
 

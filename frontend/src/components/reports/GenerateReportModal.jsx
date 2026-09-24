@@ -4,42 +4,35 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { X, FileText, Sparkles, Loader2 } from 'lucide-react';
 
+import { generateSecurityReport } from '@/lib/reports';
+
 export function GenerateReportModal({ isOpen, onClose, onCreated }) {
   const [name, setName] = useState('Ad-hoc Threat Audit');
   const [type, setType] = useState('Security Scan');
-  const [dateRange, setDateRange] = useState('Sep 15, 2026 - Sep 21, 2026');
-  const [format, setFormat] = useState('PDF');
+  const [dateRange, setDateRange] = useState('Past 7 Days');
+  const [format, setFormat] = useState('JSON');
   const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsGenerating(true);
 
-    setTimeout(() => {
-      setIsGenerating(false);
-      const newReport = {
-        id: `rep-${Date.now()}`,
+    try {
+      const newReport = await generateSecurityReport({
         name: name || 'Custom Security Report',
         type,
-        typeBadge:
-          type === 'Security Scan'
-            ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-            : type === 'Threat Analysis'
-            ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-            : type === 'Model Usage'
-            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-            : 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
-        dateGenerated: 'Sep 22, 2026',
-        status: 'Completed',
-        statusBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
         format,
-        size: '1.8 MB',
-      };
+        dateRange,
+      });
       onCreated(newReport);
       onClose();
-    }, 600);
+    } catch (err) {
+      console.error('Failed to generate report:', err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (

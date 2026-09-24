@@ -9,11 +9,13 @@ export function AttackCategoryDistributionCard({ data }) {
   const circumference = 2 * Math.PI * radius;
 
   const segments = React.useMemo(() => {
+    if (!Array.isArray(data)) return [];
     let acc = 0;
     return data.map((item) => {
-      const strokeDasharray = `${(item.percentage / 100) * circumference} ${circumference}`;
+      const percentage = Number(item.percentage) || 0;
+      const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
       const strokeDashoffset = `-${(acc / 100) * circumference}`;
-      acc += item.percentage;
+      acc += percentage;
       return { ...item, strokeDasharray, strokeDashoffset };
     });
   }, [data, circumference]);

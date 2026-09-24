@@ -41,8 +41,15 @@ export function SuspiciousChunksTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/40 text-xs">
-              {chunks.map((row) => {
-                const isSelected = selectedChunkId === row.id;
+              {(!chunks || chunks.length === 0) ? (
+                <tr>
+                  <td colSpan="6" className="py-12 text-center text-slate-500">
+                    No suspicious chunks detected. Upload and scan a document to identify threat vectors.
+                  </td>
+                </tr>
+              ) : (
+                chunks.map((row) => {
+                  const isSelected = selectedChunkId === row.id;
 
                 return (
                   <tr
@@ -90,7 +97,7 @@ export function SuspiciousChunksTable({
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>

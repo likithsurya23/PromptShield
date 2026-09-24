@@ -9,7 +9,7 @@ import { registerWithCredentials } from '@/lib/auth';
 
 export function RegisterForm() {
   const router = useRouter();
-  const [fullName, setFullName] = useState('Likith D');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -38,7 +38,7 @@ export function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!username || !email || !password) {
       setError('Please fill in all required fields');
       return;
     }
@@ -55,13 +55,13 @@ export function RegisterForm() {
     setError('');
 
     try {
-      const res = await registerWithCredentials(fullName, email, password);
+      const res = await registerWithCredentials(username, email, password);
       if (res.success) {
-        router.push('/');
+        router.push('/login');
       } else {
-        setError('Registration failed. Please try again.');
+        setError(res.error || 'Registration failed. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during account creation');
     } finally {
       setLoading(false);
@@ -72,27 +72,27 @@ export function RegisterForm() {
     <div className="flex flex-col justify-between h-full p-2 sm:p-4">
       <div>
         {/* Header Tag and Title */}
-        <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1 block">
+        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1 block">
           CREATE ACCOUNT
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-          Join <span className="text-blue-500">PromptShield</span>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          Join <span className="text-rose-600 dark:text-[#f57b83]">PromptShield</span>
         </h1>
-        <p className="text-xs text-slate-400 mt-2 mb-5 leading-relaxed">
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 mb-5 leading-relaxed">
           Create your account and start securing your LLM applications today.
         </p>
 
         {error && (
-          <div className="mb-4 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+          <div className="mb-4 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs">
             {error}
           </div>
         )}
 
         {/* Register Form */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
-          {/* Full Name */}
+          {/* Username */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300 block">Full Name</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Username</label>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                 <User className="w-4 h-4" />
@@ -100,17 +100,17 @@ export function RegisterForm() {
               <input
                 type="text"
                 required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Likith D"
-                className="w-full bg-[#0e1626] border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="e.g. Kurosaki Ichigo"
+                className="w-full bg-slate-50 dark:bg-[#140c17] border border-slate-300 dark:border-[#2c1622] rounded-xl py-2 pl-10 pr-4 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm"
               />
             </div>
           </div>
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300 block">Email</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Email</label>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                 <Mail className="w-4 h-4" />
@@ -121,14 +121,14 @@ export function RegisterForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-[#0e1626] border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-[#140c17] border border-slate-300 dark:border-[#2c1622] rounded-xl py-2 pl-10 pr-4 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm"
               />
             </div>
           </div>
 
           {/* Password */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300 block">Password</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Password</label>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                 <Lock className="w-4 h-4" />
@@ -139,12 +139,12 @@ export function RegisterForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#0e1626] border border-slate-800 rounded-xl py-2 pl-10 pr-10 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono tracking-wider"
+                className="w-full bg-slate-50 dark:bg-[#140c17] border border-slate-300 dark:border-[#2c1622] rounded-xl py-2 pl-10 pr-10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono tracking-wider shadow-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 text-slate-400 hover:text-slate-200 transition-colors"
+                className="absolute right-3.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -157,7 +157,7 @@ export function RegisterForm() {
                   <div
                     key={step}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      step <= strength.score ? strength.color : 'bg-slate-800'
+                      step <= strength.score ? strength.color : 'bg-slate-200 dark:bg-slate-800'
                     }`}
                   />
                 ))}
@@ -170,7 +170,7 @@ export function RegisterForm() {
 
           {/* Confirm Password */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300 block">Confirm Password</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Confirm Password</label>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                 <Lock className="w-4 h-4" />
@@ -181,12 +181,12 @@ export function RegisterForm() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#0e1626] border border-slate-800 rounded-xl py-2 pl-10 pr-10 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono tracking-wider"
+                className="w-full bg-slate-50 dark:bg-[#140c17] border border-slate-300 dark:border-[#2c1622] rounded-xl py-2 pl-10 pr-10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono tracking-wider shadow-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3.5 text-slate-400 hover:text-slate-200 transition-colors"
+                className="absolute right-3.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -195,21 +195,21 @@ export function RegisterForm() {
 
           {/* Agree Terms Checkbox */}
           <div className="pt-1">
-            <label className="flex items-start gap-2.5 cursor-pointer select-none text-[11px] text-slate-300">
+            <label className="flex items-start gap-2.5 cursor-pointer select-none text-[11px] text-slate-600 dark:text-slate-300">
               <input
                 type="checkbox"
                 required
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="w-4 h-4 rounded bg-[#0e1626] border-slate-700 text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-blue-600 mt-0.5"
+                className="w-4 h-4 rounded bg-slate-100 dark:bg-[#140c17] border-slate-300 dark:border-[#2c1622] text-rose-600 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-rose-600 mt-0.5"
               />
               <span>
                 I agree to the{' '}
-                <Link href="/terms" className="text-blue-400 hover:underline">
+                <Link href="/terms" className="text-rose-600 dark:text-[#f57b83] hover:underline">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link href="/privacy" className="text-blue-400 hover:underline">
+                <Link href="/privacy" className="text-rose-600 dark:text-[#f57b83] hover:underline">
                   Privacy Policy
                 </Link>
               </span>
@@ -220,7 +220,7 @@ export function RegisterForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-900/40 transition-all disabled:opacity-50 mt-3 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all disabled:opacity-50 mt-3 cursor-pointer"
           >
             {loading ? (
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -238,9 +238,9 @@ export function RegisterForm() {
       </div>
 
       {/* Footer Switch */}
-      <div className="text-center pt-5 text-xs text-slate-400">
+      <div className="text-center pt-5 text-xs text-slate-600 dark:text-slate-400">
         Already have an account?{' '}
-        <Link href="/login" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+        <Link href="/login" className="text-rose-600 dark:text-[#f57b83] hover:underline font-semibold transition-colors">
           Sign in
         </Link>
       </div>
