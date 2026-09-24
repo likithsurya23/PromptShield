@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db.database import db_manager
-from app.routes import analytics, auth, health, scan
+from app.routes import analytics, auth, health, rag, scan, simulator
 from app.security.ml_detector import MLDetector
 from app.security.scanner import PromptScanner
 
@@ -21,12 +21,6 @@ scanner = PromptScanner()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Application lifespan context manager:
-    1. Connects to MongoDB Atlas / Local instance asynchronously.
-    2. Loads PromptShield DistilBERT V2 once into memory during startup.
-    3. Handles graceful cleanup on shutdown.
-    """
     logger.info("Initializing PromptShield Security Engine...")
 
     # 1. Connect to MongoDB
@@ -54,7 +48,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="PromptShield — LLM Prompt-Injection Firewall, Security Engine, and Audit API",
+    description="PromptShield",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan
@@ -65,8 +59,6 @@ origins = [
     settings.FRONTEND_URL,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -82,6 +74,8 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(scan.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
+app.include_router(rag.router, prefix="/api/v1")
+app.include_router(simulator.router, prefix="/api/v1")
 
 
 @app.get("/", tags=["Root"])

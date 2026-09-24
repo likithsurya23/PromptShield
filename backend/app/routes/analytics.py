@@ -21,6 +21,16 @@ async def get_scan_logs(
     return logs
 
 
+@router.delete(
+    "/scans",
+    summary="Clear Scan Audit Logs",
+    description="Purge all audit logs from memory and database."
+)
+async def clear_scan_logs() -> Dict[str, Any]:
+    count = await db_manager.clear_scans()
+    return {"message": "Scan history cleared successfully", "cleared_count": count}
+
+
 @router.get(
     "/analytics/summary",
     response_model=AnalyticsSummaryResponse,

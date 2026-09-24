@@ -47,7 +47,9 @@ class RiskEngine:
     def compute_risk(
         self,
         ml_score: float,
-        rule_categories: List[str]
+        rule_categories: List[str],
+        allow_threshold: Optional[float] = None,
+        block_threshold: Optional[float] = None
     ) -> Dict[str, Any]:
         """
         Compute risk score and enforcement decision.
@@ -70,12 +72,12 @@ class RiskEngine:
         risk_score = min(round(risk, 2), 100.0)
 
         # Configurable decision thresholds
-        allow_threshold = settings.RISK_ALLOW_THRESHOLD
-        block_threshold = settings.RISK_BLOCK_THRESHOLD
+        allow_thresh = allow_threshold if allow_threshold is not None else settings.RISK_ALLOW_THRESHOLD
+        block_thresh = block_threshold if block_threshold is not None else settings.RISK_BLOCK_THRESHOLD
 
-        if risk_score < allow_threshold:
+        if risk_score < allow_thresh:
             action = "ALLOW"
-        elif risk_score < block_threshold:
+        elif risk_score < block_thresh:
             action = "WARN"
         else:
             action = "BLOCK"

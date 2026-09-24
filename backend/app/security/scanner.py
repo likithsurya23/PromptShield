@@ -24,37 +24,69 @@ class PromptScanner:
         """Inject or update the ML detector after startup."""
         self.ml_detector = ml_detector
 
-    def scan(self, prompt: str) -> Dict[str, Any]:
+    def scan(
+        self,
+        prompt: str,
+        allow_threshold: Optional[float] = None,
+        block_threshold: Optional[float] = None,
+        ml_detection: bool = True,
+        rule_detection: bool = True,
+        auto_block_high_risk: bool = True
+    ) -> Dict[str, Any]:
         """
-        Execute full security scan for a single prompt.
+        Execute full security scan for a single prompt with customizable mode and thresholds.
         """
         if self.ml_detector is None:
             raise RuntimeError("ML Detector is not loaded in PromptScanner.")
 
         # 1. ML Detector
-        ml_result = self.ml_detector.predict(prompt)
-        ml_malicious_score = ml_result["malicious_probability"]
+        if ml_detection:
+            ml_result = self.ml_detector.predict(prompt)
+            ml_malicious_score = ml_result["malicious_probability"]
+            prediction = ml_result["prediction"]
+            confidence = ml_result["confidence"]
+            benign_prob = ml_result["benign_probability"]
+            malicious_prob = ml_result["malicious_probability"]
+        else:
+            ml_malicious_score = 0.0
+            prediction = "benign"
+            confidence = 1.0
+            benign_prob = 1.0
+            malicious_prob = 0.0
 
         # 2. Rule Detector
-        rule_result = self.rule_detector.detect(prompt)
-        attack_categories = rule_result["attack_categories"]
+        if rule_detection:
+            rule_result = self.rule_detector.detect(prompt)
+            attack_categories = rule_result["attack_categories"]
+            matched_rules = rule_result.get("matched_rules", [])
+            if not ml_detection and attack_categories:
+                prediction = "malicious"
+        else:
+            attack_categories = []
+            matched_rules = []
 
         # 3. Risk Engine
         risk_result = self.risk_engine.compute_risk(
             ml_score=ml_malicious_score,
-            rule_categories=attack_categories
+            rule_categories=attack_categories,
+            allow_threshold=allow_threshold,
+            block_threshold=block_threshold
         )
+
+        action = risk_result["action"]
+        if not auto_block_high_risk and action == "BLOCK":
+            action = "WARN"
 
         # 4. Synthesize Final Security Result
         return {
-            "prediction": ml_result["prediction"],
-            "ml_confidence": ml_result["confidence"],
-            "benign_probability": ml_result["benign_probability"],
-            "malicious_probability": ml_result["malicious_probability"],
+            "prediction": prediction,
+            "ml_confidence": confidence,
+            "benign_probability": benign_prob,
+            "malicious_probability": malicious_prob,
             "attack_categories": attack_categories,
-            "matched_rules": rule_result.get("matched_rules", []),
+            "matched_rules": matched_rules,
             "risk_score": risk_result["risk_score"],
-            "action": risk_result["action"]
+            "action": action
         }
 
     def scan_batch(self, prompts: List[str]) -> List[Dict[str, Any]]:

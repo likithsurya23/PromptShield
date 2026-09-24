@@ -7,6 +7,7 @@ os.environ["USE_TF"] = "0"
 os.environ["TRANSFORMERS_NO_TF"] = "1"
 os.environ["USE_TORCH"] = "1"
 
+import re
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -37,14 +38,30 @@ class MLDetector:
         self.is_loaded = True
         logger.info("PromptShield DistilBERT V2 successfully loaded in evaluation mode.")
 
+    @staticmethod
+    def _normalize_prompt(prompt: str) -> str:
+        """
+        Normalize conversational politeness prefixes (e.g. 'Please ', 'Kindly ')
+        which skew DistilBERT token attention towards injection false-positives.
+        """
+        text = prompt.strip()
+        cleaned = re.sub(
+            r"^\s*(?:please|kindly|could you please|can you please)\s*,?\s*",
+            "",
+            text,
+            flags=re.IGNORECASE
+        )
+        return cleaned if cleaned else text
+
     def predict(self, prompt: str) -> Dict[str, Any]:
         """
         Run inference on a single prompt.
         LABEL_0 = Benign
         LABEL_1 = Prompt Injection (Malicious)
         """
+        norm_prompt = self._normalize_prompt(prompt)
         inputs = self.tokenizer(
-            prompt,
+            norm_prompt,
             return_tensors="pt",
             truncation=True,
             max_length=256,
@@ -79,8 +96,9 @@ class MLDetector:
         if not prompts:
             return []
 
+        norm_prompts = [self._normalize_prompt(p) for p in prompts]
         inputs = self.tokenizer(
-            prompts,
+            norm_prompts,
             padding=True,
             truncation=True,
             max_length=256,

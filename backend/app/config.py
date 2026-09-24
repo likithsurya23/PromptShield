@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     FRONTEND_URL: str = "http://localhost:5173"
 
-    # MongoDB Atlas or local connection
+    # MongoDB Atlas or local connection (Loaded from .env)
     MONGODB_URI: Optional[str] = None
     MONGODB_DB_NAME: str = "promptshield"
 
@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "promptshield-dev-secret-key-replace-in-production-min32char"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+
+    # OAuth Integration
+    GITHUB_CLIENT_ID: Optional[str] = None
+    GITHUB_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

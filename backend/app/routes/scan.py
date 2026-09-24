@@ -35,7 +35,14 @@ async def scan_prompt(
 ) -> ScanResponse:
     scanner = get_scanner(req)
     try:
-        result = scanner.scan(request.prompt)
+        result = scanner.scan(
+            prompt=request.prompt,
+            allow_threshold=request.allow_threshold,
+            block_threshold=request.block_threshold,
+            ml_detection=request.ml_detection if request.ml_detection is not None else True,
+            rule_detection=request.rule_detection if request.rule_detection is not None else True,
+            auto_block_high_risk=request.auto_block_high_risk if request.auto_block_high_risk is not None else True,
+        )
 
         # Asynchronously log scan into MongoDB if connected
         user_id = current_user.get("sub") if current_user else None

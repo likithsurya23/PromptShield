@@ -12,11 +12,12 @@ router = APIRouter(tags=["Health"])
     summary="Health Check",
     description="Check the health status of PromptShield API, ML model readiness, and database connectivity."
 )
-def get_health(request: Request) -> HealthResponse:
+async def get_health(request: Request) -> HealthResponse:
+    is_connected = await db_manager.ensure_connected()
     model_loaded = getattr(request.app.state, "model_loaded", False)
     return HealthResponse(
         status="ok",
         service=f"{settings.APP_NAME} API",
         model_loaded=model_loaded,
-        database_connected=db_manager.is_connected
+        database_connected=is_connected
     )

@@ -17,27 +17,30 @@ class RuleDetector:
         if rules_path:
             self.rules_path = Path(rules_path)
         else:
-            # backend/rules/rules.json
             backend_dir = Path(__file__).resolve().parent.parent.parent
             self.rules_path = backend_dir / "rules" / "rules.json"
 
-        self.rules: Dict[str, List[str]] = self._load_rules()
-        # Precompile regular expressions with re.IGNORECASE
-        self.compiled_rules: Dict[str, List[re.Pattern]] = {
-            category: [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
-            for category, patterns in self.rules.items()
-        }
+        self.rules: Dict[str, List[str]] = {}
+        self.compiled_rules: Dict[str, List[re.Pattern]] = {}
+        self._last_mtime: float = 0
+        self._reload_rules_if_modified()
 
-    def _load_rules(self) -> Dict[str, List[str]]:
+    def _reload_rules_if_modified(self) -> None:
         try:
             if not self.rules_path.exists():
-                logger.warning(f"Rules file not found at {self.rules_path}, using empty ruleset.")
-                return {}
-            with open(self.rules_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                return
+            mtime = self.rules_path.stat().st_mtime
+            if mtime > self._last_mtime:
+                with open(self.rules_path, "r", encoding="utf-8") as f:
+                    self.rules = json.load(f)
+                self.compiled_rules = {
+                    category: [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
+                    for category, patterns in self.rules.items()
+                }
+                self._last_mtime = mtime
+                logger.info(f"Loaded {sum(len(v) for v in self.rules.values())} detection rules across {len(self.rules)} categories.")
         except Exception as e:
             logger.error(f"Failed to load rules from {self.rules_path}: {e}")
-            return {}
 
     def detect(self, prompt: str) -> Dict[str, Any]:
         """
@@ -48,6 +51,7 @@ class RuleDetector:
                 "matched_rules": ["ignore\\s+(all\\s+)?previous\\s+instructions", ...]
             }
         """
+        self._reload_rules_if_modified()
         matched_categories: List[str] = []
         matched_rules: List[str] = []
 
