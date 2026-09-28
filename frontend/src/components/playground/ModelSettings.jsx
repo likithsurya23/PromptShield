@@ -28,8 +28,8 @@ export function ModelSettings({
   };
 
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl mb-4">
-      <h2 className="text-sm font-semibold text-white mb-3.5">
+    <Card className="p-5 border-slate-200 dark:border-slate-800/80 bg-white/95 dark:bg-[#0c1222]/80 shadow-xl mb-4 transition-colors">
+      <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-3.5">
         1. Model & Settings
       </h2>
 
@@ -37,44 +37,44 @@ export function ModelSettings({
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Provider */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-medium text-slate-400 block">
+          <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">
             Provider
           </label>
           <div className="relative">
             <select
               value={provider}
               onChange={(e) => handleProviderChange(e.target.value)}
-              className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 pl-8 pr-7 text-xs font-semibold text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
+              className="w-full bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-8 pr-7 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
             >
               {providers.map((p) => (
-                <option key={p} value={p} className="bg-[#0f172a] text-white">
+                <option key={p} value={p} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white">
                   {p}
                 </option>
               ))}
             </select>
-            <Sparkles className="w-3.5 h-3.5 text-blue-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
 
         {/* Model */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-medium text-slate-400 block">
+          <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">
             Model
           </label>
           <div className="relative">
             <select
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-2 pl-8 pr-7 text-xs font-semibold text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
+              className="w-full bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-8 pr-7 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
             >
               {(modelsByProvider[provider] || []).map((m) => (
-                <option key={m} value={m} className="bg-[#0f172a] text-white">
+                <option key={m} value={m} className="bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white">
                   {m}
                 </option>
               ))}
             </select>
-            <Cpu className="w-3.5 h-3.5 text-indigo-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Cpu className="w-3.5 h-3.5 text-indigo-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
@@ -85,8 +85,8 @@ export function ModelSettings({
         {/* Temperature */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 font-medium">Temperature</span>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-blue-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Temperature</span>
+            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-400">
               {temperature}
             </span>
           </div>
@@ -97,15 +97,15 @@ export function ModelSettings({
             step="0.1"
             value={temperature}
             onChange={(e) => setTemperature(parseFloat(e.target.value))}
-            className="w-full accent-blue-600 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+            className="w-full accent-blue-600 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer"
           />
         </div>
 
         {/* Max Tokens */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 font-medium">Max Tokens</span>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-blue-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Max Tokens</span>
+            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-400">
               {maxTokens}
             </span>
           </div>
@@ -116,7 +116,7 @@ export function ModelSettings({
             step="128"
             value={maxTokens}
             onChange={(e) => setMaxTokens(parseInt(e.target.value))}
-            className="w-full accent-blue-600 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+            className="w-full accent-blue-600 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer"
           />
         </div>
       </div>

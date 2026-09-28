@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout/AppShell';
 import { SettingsHeader } from '@/components/settings/SettingsHeader';
 import { ProfileCard } from '@/components/settings/ProfileCard';
 import { SecurityConfigurationCard } from '@/components/settings/SecurityConfigurationCard';
 import { AppearanceCard } from '@/components/settings/AppearanceCard';
 import { NotificationsCard } from '@/components/settings/NotificationsCard';
-import { ApiIntegrationCard } from '@/components/settings/ApiIntegrationCard';
 import { DataManagementCard } from '@/components/settings/DataManagementCard';
 import {
   DEFAULT_SETTINGS,
@@ -23,12 +23,13 @@ import {
   resetAllSettings,
   applyAppearance,
 } from '@/lib/settings';
-import { getStoredToken } from '@/lib/auth';
+import { getStoredToken, deleteAccount, updateUserProfile, updateUserPassword } from '@/lib/auth';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState(DEFAULT_SETTINGS.profile);
   const [security, setSecurity] = useState(DEFAULT_SETTINGS.security);
   const [appearance, setAppearance] = useState(DEFAULT_SETTINGS.appearance);
@@ -38,6 +39,7 @@ export default function SettingsPage() {
   const [toastType, setToastType] = useState('success');
   const [isExporting, setIsExporting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     const syncAll = async () => {
@@ -118,13 +120,27 @@ export default function SettingsPage() {
     setProfile((prev) => ({ ...prev, [field]: val }));
   };
 
-  const handleSaveProfile = () => {
-    saveProfileSettings(profile);
-    showToast('Profile information updated and saved successfully.');
+  const handleSaveProfile = async () => {
+    try {
+      await updateUserProfile({
+        username: profile.username,
+        name: profile.name || profile.username,
+        email: profile.email,
+      });
+      saveProfileSettings(profile);
+      showToast('Profile updated and synchronized with database.');
+    } catch (err) {
+      showToast(err.message || 'Failed to update profile.', 'error');
+    }
   };
 
-  const handleChangePassword = () => {
-    showToast('Password changed successfully.');
+  const handleChangePassword = async (currentPassword, newPassword) => {
+    try {
+      const res = await updateUserPassword(currentPassword, newPassword);
+      showToast(res.message || 'Password changed successfully in database.');
+    } catch (err) {
+      throw err;
+    }
   };
 
   // Security
@@ -256,6 +272,21 @@ export default function SettingsPage() {
     showToast('All system preferences have been reset to factory defaults.');
   };
 
+  // Permanently Delete Account
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      const res = await deleteAccount();
+      showToast(res.message || 'Account successfully deleted. Redirecting...', 'success');
+      setTimeout(() => {
+        router.push('/login?deleted=true');
+      }, 1200);
+    } catch (err) {
+      showToast('Error deleting account: ' + err.message, 'error');
+      setIsDeletingAccount(false);
+    }
+  };
+
   return (
     <AppShell>
       <div className="space-y-6 max-w-[1700px] mx-auto pb-12">
@@ -312,14 +343,14 @@ export default function SettingsPage() {
               onSaveNotifications={handleSaveNotifications}
             />
 
-            <ApiIntegrationCard onShowToast={(msg) => showToast(msg)} />
-
             <DataManagementCard
               onExportData={handleExportData}
               onClearData={handleClearData}
               onResetAllSettings={handleResetAllSettings}
+              onDeleteAccount={handleDeleteAccount}
               isExporting={isExporting}
               isClearing={isClearing}
+              isDeleting={isDeletingAccount}
             />
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 const subscribeReducedMotion = (callback) => {
   if (typeof window === 'undefined') return () => {};
@@ -21,18 +21,6 @@ const getReducedMotionSnapshot = () => {
 
 const getServerSnapshot = () => false;
 
-/**
- * CyberBackgroundAnimation
- *
- * Enterprise AI Cybersecurity Network Background:
- * - Subtle, premium particle constellation (AI nodes)
- * - Proximity-linked defense mesh (network security)
- * - Slow data-flow packets traveling across links (prompt inspection)
- * - Faint digital security grid with intersection lattices
- * - Soft, breathing blue/cyan/purple ambient radiance
- * - Full WCAG 2.1/2.2 prefers-reduced-motion accessibility support (0% idle CPU on reduce)
- * - pointer-events: none, strictly background layer, zero layout disruption
- */
 export function CyberBackgroundAnimation() {
   const canvasRef = useRef(null);
   const prefersReducedMotion = useSyncExternalStore(
@@ -40,6 +28,34 @@ export function CyberBackgroundAnimation() {
     getReducedMotionSnapshot,
     getServerSnapshot
   );
+
+  // Theme tracking for canvas contrast
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkDark = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDark();
+
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    const handleAppearanceUpdate = (e) => {
+      if (e.detail?.theme) {
+        setIsDark(e.detail.theme.toLowerCase() !== 'light');
+      }
+    };
+    window.addEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
+    };
+  }, []);
 
   // Main Canvas Network Engine
   useEffect(() => {
@@ -71,35 +87,39 @@ export function CyberBackgroundAnimation() {
       }
     };
 
-    // Node & Particle Configuration
-    // Density tuned for enterprise elegance: not crowded, not sparse
     const isMobile = window.innerWidth < 768;
-    const nodeCount = isMobile ? 22 : Math.min(48, Math.floor(window.innerWidth / 36));
+    const nodeCount = isMobile ? 24 : Math.min(52, Math.floor(window.innerWidth / 34));
 
     const particles = [];
-    const colors = [
-      { r: 245, g: 123, b: 131 }, // #f57b83 Vibrant Coral Rose
-      { r: 225, g: 29, b: 72 },   // #e11d48 Cyber Crimson
-      { r: 106, g: 26, b: 36 },   // #6a1a24 Deep Crimson Wine
-      { r: 253, g: 198, b: 203 }, // #fdc6cb Soft Rose Blush
-    ];
+    const colors = isDark
+      ? [
+          { r: 245, g: 123, b: 131 }, // #f57b83 Vibrant Coral Rose
+          { r: 225, g: 29, b: 72 },   // #e11d48 Cyber Crimson
+          { r: 106, g: 26, b: 36 },   // #6a1a24 Deep Wine
+          { r: 253, g: 198, b: 203 }, // #fdc6cb Soft Rose Blush
+        ]
+      : [
+          { r: 225, g: 29, b: 72 },   // #e11d48 Cyber Crimson
+          { r: 244, g: 63, b: 94 },   // #f43f5e Rose 500
+          { r: 190, g: 18, b: 60 },   // #be123c Deep Ruby
+          { r: 251, g: 113, b: 133 }, // #fb7185 Vivid Rose
+        ];
 
     for (let i = 0; i < nodeCount; i++) {
       const color = colors[i % colors.length];
       particles.push({
         x: Math.random() * (window.innerWidth || 1200),
         y: Math.random() * (window.innerHeight || 800),
-        vx: (Math.random() - 0.5) * 0.28, // Ultra-gentle drift
+        vx: (Math.random() - 0.5) * 0.28,
         vy: (Math.random() - 0.5) * 0.28,
-        radius: Math.random() * 1.8 + 1.2,
+        radius: Math.random() * 2.0 + 1.2,
         color,
-        baseAlpha: Math.random() * 0.35 + 0.2,
+        baseAlpha: Math.random() * 0.35 + 0.25,
         pulseOffset: Math.random() * Math.PI * 2,
-        isCoreDefenseNode: i % 4 === 0, // Firewall anchor node
+        isCoreDefenseNode: i % 4 === 0,
       });
     }
 
-    // Data-flow packet simulation: small packets traveling across links
     const packets = [];
     const maxPackets = isMobile ? 4 : 8;
 
@@ -109,17 +129,14 @@ export function CyberBackgroundAnimation() {
         sourceIndex,
         targetIndex,
         progress: 0,
-        speed: Math.random() * 0.005 + 0.003, // Slow, elegant data transit
-        color: Math.random() > 0.4 ? 'rgba(245, 123, 131, ' : 'rgba(253, 198, 203, ',
+        speed: Math.random() * 0.006 + 0.003,
+        color: isDark ? 'rgba(245, 123, 131, ' : 'rgba(225, 29, 72, ',
       });
     }
 
-    /**
-     * Draw Faint Digital Grid & Matrix Lattice
-     */
     function drawDigitalGrid() {
       const gridSize = 72;
-      ctx.strokeStyle = 'rgba(106, 26, 36, 0.14)';
+      ctx.strokeStyle = isDark ? 'rgba(106, 26, 36, 0.14)' : 'rgba(225, 29, 72, 0.1)';
       ctx.lineWidth = 0.75;
 
       ctx.beginPath();
@@ -133,27 +150,23 @@ export function CyberBackgroundAnimation() {
       }
       ctx.stroke();
 
-      // Subtle matrix dots at grid intersections
-      ctx.fillStyle = 'rgba(245, 123, 131, 0.07)';
+      // Intersect dots
+      ctx.fillStyle = isDark ? 'rgba(245, 123, 131, 0.08)' : 'rgba(225, 29, 72, 0.16)';
       for (let x = 0; x < width; x += gridSize * 2) {
         for (let y = 0; y < height; y += gridSize * 2) {
           ctx.beginPath();
-          ctx.arc(x, y, 1, 0, Math.PI * 2);
+          ctx.arc(x, y, 1.2, 0, Math.PI * 2);
           ctx.fill();
         }
       }
     }
 
-    /**
-     * Static Render for prefers-reduced-motion (0% CPU, no requestAnimationFrame loop)
-     */
     function renderStaticCyberGrid() {
       if (!ctx || width === 0 || height === 0) return;
       ctx.clearRect(0, 0, width, height);
 
       drawDigitalGrid();
 
-      // Stationary Links
       const maxDistance = 160;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -162,7 +175,7 @@ export function CyberBackgroundAnimation() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
-            const alpha = (1 - dist / maxDistance) * 0.16;
+            const alpha = (1 - dist / maxDistance) * (isDark ? 0.16 : 0.25);
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -173,26 +186,22 @@ export function CyberBackgroundAnimation() {
         }
       }
 
-      // Stationary Nodes
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         if (p.isCoreDefenseNode) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.08)`;
+          ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.12)`;
           ctx.fill();
         }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.45)`;
+        ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.55)`;
         ctx.fill();
       }
     }
 
-    /**
-     * Active 60fps Dynamic Cybersecurity Network Animation
-     */
     function animate(time) {
       if (!ctx || width === 0 || height === 0) return;
       ctx.clearRect(0, 0, width, height);
@@ -200,7 +209,7 @@ export function CyberBackgroundAnimation() {
       // 1. Digital Grid
       drawDigitalGrid();
 
-      // 2. Calculate and render network connection lines
+      // 2. Network links
       const maxDistance = 150;
       const connectedPairs = [];
 
@@ -212,9 +221,8 @@ export function CyberBackgroundAnimation() {
 
           if (dist < maxDistance) {
             connectedPairs.push({ i, j });
-            const alpha = (1 - dist / maxDistance) * 0.22;
+            const alpha = (1 - dist / maxDistance) * (isDark ? 0.22 : 0.32);
 
-            // Gradient link between node colors
             const grad = ctx.createLinearGradient(
               particles[i].x,
               particles[i].y,
@@ -234,95 +242,78 @@ export function CyberBackgroundAnimation() {
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.strokeStyle = grad;
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = isDark ? 0.8 : 1.0;
             ctx.stroke();
 
-            // Random chance to spawn a data packet on this link
-            if (Math.random() < 0.0015 && packets.length < maxPackets) {
+            if (Math.random() < 0.0003) {
               spawnPacket(i, j);
             }
           }
         }
       }
 
-      // 3. Render and update data-flow packets
-      for (let k = packets.length - 1; k >= 0; k--) {
-        const pkt = packets[k];
+      // 3. Data Packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const pkt = packets[i];
         pkt.progress += pkt.speed;
 
         if (pkt.progress >= 1) {
-          packets.splice(k, 1);
+          packets.splice(i, 1);
           continue;
         }
 
-        const p1 = particles[pkt.sourceIndex];
-        const p2 = particles[pkt.targetIndex];
-        if (!p1 || !p2) {
-          packets.splice(k, 1);
+        const src = particles[pkt.sourceIndex];
+        const tgt = particles[pkt.targetIndex];
+        if (!src || !tgt) {
+          packets.splice(i, 1);
           continue;
         }
 
-        const curX = p1.x + (p2.x - p1.x) * pkt.progress;
-        const curY = p1.y + (p2.y - p1.y) * pkt.progress;
-        const packetAlpha = Math.sin(pkt.progress * Math.PI) * 0.65;
+        const px = src.x + (tgt.x - src.x) * pkt.progress;
+        const py = src.y + (tgt.y - src.y) * pkt.progress;
+        const packetAlpha = Math.sin(pkt.progress * Math.PI) * (isDark ? 0.85 : 0.95);
 
-        // Flow packet core
         ctx.beginPath();
-        ctx.arc(curX, curY, 1.8, 0, Math.PI * 2);
+        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
         ctx.fillStyle = `${pkt.color}${packetAlpha})`;
-        ctx.shadowColor = 'rgba(245, 123, 131, 0.5)';
-        ctx.shadowBlur = 4;
+        ctx.shadowColor = '#e11d48';
+        ctx.shadowBlur = 6;
         ctx.fill();
-        ctx.shadowBlur = 0; // Reset
+        ctx.shadowBlur = 0;
       }
 
-      // 4. Update and render particles / security nodes
+      // 4. Update & Draw Nodes
+      const t = time * 0.001;
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Smooth positional drift
         p.x += p.vx;
         p.y += p.vy;
 
-        // Soft viewport boundaries
-        if (p.x < 0) {
-          p.x = 0;
-          p.vx *= -1;
-        } else if (p.x > width) {
-          p.x = width;
-          p.vx *= -1;
-        }
-        if (p.y < 0) {
-          p.y = 0;
-          p.vy *= -1;
-        } else if (p.y > height) {
-          p.y = height;
-          p.vy *= -1;
-        }
+        if (p.x < -20) p.x = width + 20;
+        else if (p.x > width + 20) p.x = -20;
+        if (p.y < -20) p.y = height + 20;
+        else if (p.y > height + 20) p.y = -20;
 
-        // Slow breathing pulse
-        const pulse = Math.sin(time * 0.0015 + p.pulseOffset) * 0.25 + 0.75;
-        const alpha = p.baseAlpha * pulse;
+        const pulse = 1 + Math.sin(t * 1.5 + p.pulseOffset) * 0.18;
+        const alpha = p.baseAlpha * pulse * (isDark ? 1 : 1.3);
 
-        // Core defense aura
         if (p.isCoreDefenseNode) {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius * (3.8 * pulse), 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.radius * (2.8 * pulse), 0, Math.PI * 2);
           ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${0.08 * pulse})`;
           ctx.fill();
 
-          // Subtle concentric security ring
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.radius * (2.2 * pulse), 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${0.2 * pulse})`;
-          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${0.25 * pulse})`;
+          ctx.lineWidth = 0.6;
           ctx.stroke();
         }
 
-        // Node center
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha + 0.15})`;
+        ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha + 0.2})`;
         ctx.fill();
       }
 
@@ -344,7 +335,7 @@ export function CyberBackgroundAnimation() {
       }
       window.removeEventListener('resize', handleResize);
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, isDark]);
 
   return (
     <div
@@ -354,13 +345,13 @@ export function CyberBackgroundAnimation() {
       {/* 1. HTML5 Canvas: Dynamic AI Cybersecurity Network */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full block opacity-80"
+        className="w-full h-full block opacity-85 dark:opacity-80 transition-opacity"
       />
 
-      {/* 2. Soft Ambient Deep Crimson / Rose / Burgundy Atmospheric Radiance */}
-      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-[#6a1a24]/20 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute top-1/3 -right-32 w-[550px] h-[550px] bg-rose-600/12 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute -bottom-32 left-1/4 w-[650px] h-[650px] bg-[#881337]/15 rounded-full blur-[180px] pointer-events-none" />
+      {/* 2. Soft Ambient Atmospheric Radiance (Light vs Dark) */}
+      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-rose-300/25 dark:bg-[#6a1a24]/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 -right-32 w-[550px] h-[550px] bg-pink-300/20 dark:bg-rose-600/12 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-32 left-1/4 w-[650px] h-[650px] bg-rose-200/25 dark:bg-[#881337]/15 rounded-full blur-[160px] pointer-events-none" />
     </div>
   );
 }

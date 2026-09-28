@@ -10,7 +10,7 @@ import { CyberBackgroundAnimation } from '@/components/landing/CyberBackgroundAn
 
 export default function LandingHomePage() {
   return (
-    <div className="landing-page-root relative min-h-screen bg-[#0b080e] text-slate-100 font-sans selection:bg-rose-600 selection:text-white flex flex-col">
+    <div className="landing-page-root relative min-h-screen bg-slate-50 dark:bg-[#0b080e] text-slate-900 dark:text-slate-100 font-sans selection:bg-rose-600 selection:text-white flex flex-col transition-colors duration-200">
       {/* Background Cyber Animation with prefers-reduced-motion accessibility */}
       <CyberBackgroundAnimation />
 
@@ -18,7 +18,7 @@ export default function LandingHomePage() {
       <LandingNavbar />
 
       <main className="flex-1">
-        {/* 2. Hero Section matching uploaded design with 3D Shield & 4 Features */}
+        {/* 2. Hero Section matching design with 3D Shield & Features */}
         <HeroSection />
 
         {/* 3. How It Works (5-Stage Security Pipeline) */}

@@ -29,7 +29,7 @@ export function ProfileCard({
         .slice(0, 2)
     : '';
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setPassError('');
 
@@ -46,17 +46,21 @@ export function ProfileCard({
       return;
     }
 
-    setPassSuccess(true);
-    setTimeout(() => {
-      setPassSuccess(false);
-      setIsPasswordModalOpen(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+    try {
       if (onChangePassword) {
-        onChangePassword();
+        await onChangePassword(currentPassword, newPassword);
       }
-    }, 1200);
+      setPassSuccess(true);
+      setTimeout(() => {
+        setPassSuccess(false);
+        setIsPasswordModalOpen(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }, 1000);
+    } catch (err) {
+      setPassError(err.message || 'Failed to update password.');
+    }
   };
 
   return (

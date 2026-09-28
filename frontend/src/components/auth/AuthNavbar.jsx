@@ -27,20 +27,20 @@ export function AuthNavbar() {
   };
 
   return (
-    <header className="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+    <header className="w-full max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-6 flex items-center justify-between">
       {/* Brand Logo */}
-      <Link href="/" className="flex items-center gap-3 group">
-        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83] shadow-lg shadow-rose-950/20 transition-transform group-hover:scale-105">
-          <Shield className="w-6 h-6 fill-[#f57b83]/20 stroke-[#f57b83]" />
+      <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
+        <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83] shadow-lg shadow-rose-950/20 transition-transform group-hover:scale-105 shrink-0">
+          <Shield className="w-5 h-5 sm:w-6 sm:h-6 fill-[#f57b83]/20 stroke-[#f57b83]" />
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="w-2 h-2 rounded-full bg-[#f43f5e] animate-pulse" />
           </div>
         </div>
         <div className="flex flex-col">
-          <span className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-none">
+          <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight leading-none">
             Prompt<span className="text-[#f57b83]">Shield</span>
           </span>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 tracking-tight mt-1">
+          <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 tracking-tight mt-0.5 hidden xs:inline sm:inline">
             Secure AI. Safer Tomorrow.
           </span>
         </div>

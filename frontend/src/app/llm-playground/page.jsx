@@ -31,6 +31,7 @@ export default function LLMPlaygroundPage() {
   const [response, setResponse] = useState(null);
   const [latency, setLatency] = useState(null);
   const [outputSafe, setOutputSafe] = useState(null);
+  const [outputScan, setOutputScan] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function LLMPlaygroundPage() {
       setPipeline(res.pipeline);
       setResponse(res.response);
       setLatency(res.latency);
+      setOutputScan(res.outputScan);
       setOutputSafe(res.outputScan ? res.outputScan.passed : true);
 
       if (res.scanResult.action === 'BLOCK') {
@@ -76,7 +78,7 @@ export default function LLMPlaygroundPage() {
       } else if (res.scanResult.action === 'WARN') {
         showToast('Prompt flagged with security warning.');
       } else {
-        showToast('Prompt evaluated clean and forwarded.');
+        showToast('Prompt verified safe and response generated.');
       }
     } catch (err) {
       console.error('Playground error:', err);
@@ -97,6 +99,7 @@ export default function LLMPlaygroundPage() {
     setResponse(null);
     setLatency(null);
     setOutputSafe(null);
+    setOutputScan(null);
     showToast('Playground cleared.');
   };
 
@@ -113,18 +116,18 @@ export default function LLMPlaygroundPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             LLM Playground
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Test LLM prompts with PromptShield multi-layered security analysis and live interception.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-300 hover:text-white transition-colors shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#140c17] border border-slate-200 dark:border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
             <span>Reset Playground</span>
@@ -132,7 +135,7 @@ export default function LLMPlaygroundPage() {
 
           <Link
             href="/analytics"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#140c17] border border-slate-200 dark:border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-sm cursor-pointer"
           >
             <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
             <span>View Usage</span>
@@ -184,7 +187,7 @@ export default function LLMPlaygroundPage() {
             latency={latency}
             loading={loading}
           />
-          <OutputScanCard isSafe={outputSafe} />
+          <OutputScanCard isSafe={outputSafe} outputScan={outputScan} />
         </div>
       </div>
 

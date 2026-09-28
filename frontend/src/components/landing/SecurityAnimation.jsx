@@ -6,6 +6,34 @@ export function SecurityAnimation() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
 
+  // Theme tracking for canvas contrast
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkDark = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDark();
+
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    const handleAppearanceUpdate = (e) => {
+      if (e.detail?.theme) {
+        setIsDark(e.detail.theme.toLowerCase() !== 'light');
+      }
+    };
+    window.addEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
+    };
+  }, []);
+
   // 3D Parallax Tilt state
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -78,7 +106,7 @@ export function SecurityAnimation() {
             y,
             dist,
             intensity: 0,
-            baseAlpha: Math.max(0.04, 0.15 - (dist / forcefieldRadius) * 0.08),
+            baseAlpha: Math.max(0.08, 0.22 - (dist / forcefieldRadius) * 0.09),
           });
         }
       }
@@ -123,8 +151,8 @@ export function SecurityAnimation() {
         this.x = centerX + Math.cos(angle) * dist;
         this.y = centerY + Math.sin(angle) * dist;
         this.speed = reduceMotion ? 0 : 1.3 + Math.random() * 1.5;
-        this.size = 2.2 + Math.random() * 1.8;
-        this.color = Math.random() > 0.3 ? '#f43f5e' : '#fb7185';
+        this.size = 2.4 + Math.random() * 1.8;
+        this.color = Math.random() > 0.3 ? '#e11d48' : '#f43f5e';
         this.tail = [];
         this.tailLength = 12;
       }
@@ -141,11 +169,11 @@ export function SecurityAnimation() {
 
         // Collision with Hexagonal Forcefield Barrier
         if (dist <= forcefieldRadius + 8) {
-          // Illuminate nearby forcefield hexagons on impact!
+          // Illuminate nearby forcefield hexagons on impact
           hexagons.forEach((hex) => {
             const hDist = Math.hypot(hex.x - this.x, hex.y - this.y);
-            if (hDist < 45) {
-              hex.intensity = Math.max(hex.intensity, 1 - hDist / 45);
+            if (hDist < 48) {
+              hex.intensity = Math.max(hex.intensity, 1 - hDist / 48);
             }
           });
 
@@ -156,9 +184,6 @@ export function SecurityAnimation() {
 
           // Expand Forcefield Shockwave
           shockwaves.push(new Shockwave(this.x, this.y));
-
-          // Increment threat counter
-          setDeflectedCount((prev) => prev + 1);
 
           this.reset();
         } else {
@@ -171,10 +196,10 @@ export function SecurityAnimation() {
         // Glowing comet tail
         for (let i = 0; i < this.tail.length; i++) {
           const pt = this.tail[i];
-          const alpha = (i / this.tail.length) * 0.35;
+          const alpha = (i / this.tail.length) * (isDark ? 0.35 : 0.5);
           c.beginPath();
           c.arc(pt.x, pt.y, this.size * 0.6, 0, Math.PI * 2);
-          c.fillStyle = `rgba(244, 63, 94, ${alpha})`;
+          c.fillStyle = `rgba(225, 29, 72, ${alpha})`;
           c.fill();
         }
 
@@ -182,8 +207,8 @@ export function SecurityAnimation() {
         c.beginPath();
         c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         c.fillStyle = this.color;
-        c.shadowColor = '#f43f5e';
-        c.shadowBlur = 10;
+        c.shadowColor = '#e11d48';
+        c.shadowBlur = isDark ? 10 : 8;
         c.fill();
         c.shadowBlur = 0;
       }
@@ -199,7 +224,7 @@ export function SecurityAnimation() {
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
         this.decay = 0.035 + Math.random() * 0.03;
-        this.size = 1.2 + Math.random() * 1.8;
+        this.size = 1.4 + Math.random() * 1.8;
         this.color = color;
       }
 
@@ -214,8 +239,10 @@ export function SecurityAnimation() {
       draw(c) {
         c.beginPath();
         c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        c.fillStyle = `rgba(254, 205, 211, ${Math.max(0, this.alpha)})`;
-        c.shadowColor = '#fb7185';
+        c.fillStyle = isDark
+          ? `rgba(254, 205, 211, ${Math.max(0, this.alpha)})`
+          : `rgba(225, 29, 72, ${Math.max(0, this.alpha)})`;
+        c.shadowColor = '#e11d48';
         c.shadowBlur = 8;
         c.fill();
         c.shadowBlur = 0;
@@ -239,8 +266,10 @@ export function SecurityAnimation() {
         if (this.alpha <= 0) return;
         c.beginPath();
         c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        c.strokeStyle = `rgba(251, 113, 133, ${this.alpha})`;
-        c.lineWidth = 1.2;
+        c.strokeStyle = isDark
+          ? `rgba(251, 113, 133, ${this.alpha})`
+          : `rgba(225, 29, 72, ${this.alpha * 1.2})`;
+        c.lineWidth = 1.4;
         c.stroke();
       }
     }
@@ -255,7 +284,7 @@ export function SecurityAnimation() {
       ctx.clearRect(0, 0, width, height);
 
       // 1. Draw Hexagonal Forcefield Grid
-      const breathingPulse = Math.sin(frame * 0.02) * 0.03;
+      const breathingPulse = Math.sin(frame * 0.02) * 0.04;
 
       for (let hex of hexagons) {
         // Decay impact intensity
@@ -263,11 +292,29 @@ export function SecurityAnimation() {
           hex.intensity = Math.max(0, hex.intensity - 0.025);
         }
 
-        const totalAlpha = Math.min(1, hex.baseAlpha + breathingPulse + hex.intensity * 0.8);
-        const strokeColor = `rgba(244, 63, 94, ${totalAlpha})`;
-        const fillColor = hex.intensity > 0.1 ? `rgba(244, 63, 94, ${hex.intensity * 0.35})` : null;
+        // Higher visibility multiplier in light theme
+        const alphaMultiplier = isDark ? 1.0 : 1.6;
+        const totalAlpha = Math.min(1, (hex.baseAlpha + breathingPulse + hex.intensity * 0.8) * alphaMultiplier);
+        
+        const strokeColor = isDark
+          ? `rgba(244, 63, 94, ${totalAlpha})`
+          : `rgba(225, 29, 72, ${totalAlpha})`;
 
-        drawHex(ctx, hex.x, hex.y, hexRadius - 1.5, strokeColor, fillColor, hex.intensity > 0.2 ? 1.5 : 0.7);
+        const fillColor = hex.intensity > 0.08
+          ? isDark
+            ? `rgba(244, 63, 94, ${hex.intensity * 0.35})`
+            : `rgba(225, 29, 72, ${hex.intensity * 0.45})`
+          : (!isDark ? `rgba(244, 63, 94, 0.03)` : null);
+
+        drawHex(
+          ctx,
+          hex.x,
+          hex.y,
+          hexRadius - 1.5,
+          strokeColor,
+          fillColor,
+          hex.intensity > 0.2 ? 1.8 : (isDark ? 0.8 : 1.1)
+        );
       }
 
       // 2. Draw Subtle Concentric Defense Wave Radiance
@@ -275,8 +322,10 @@ export function SecurityAnimation() {
         const wave = (frame * 0.01) % 1;
         ctx.beginPath();
         ctx.arc(centerX, centerY, forcefieldRadius * (0.8 + wave * 0.4), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(244, 63, 94, ${(1 - wave) * 0.15})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isDark
+          ? `rgba(244, 63, 94, ${(1 - wave) * 0.2})`
+          : `rgba(225, 29, 72, ${(1 - wave) * 0.35})`;
+        ctx.lineWidth = 1.2;
         ctx.stroke();
       }
 
@@ -309,7 +358,7 @@ export function SecurityAnimation() {
       if (animId) cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <div
@@ -317,13 +366,13 @@ export function SecurityAnimation() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full max-w-[580px] aspect-[574/450] flex items-center justify-center select-none group cursor-pointer"
+      className="relative w-full max-w-[580px] aspect-[574/450] flex items-center justify-center select-none group cursor-pointer overflow-hidden rounded-2xl"
       style={{ perspective: '1100px' }}
       title="Interactive 3D AI Security Shield & Threat Deflection Forcefield"
     >
-      {/* 1. Deep Atmospheric Cyber Nebula Glow */}
-      <div className="absolute w-[460px] h-[460px] bg-gradient-to-tr from-[#881337]/40 via-[#e11d48]/20 to-[#4c0519]/35 rounded-full blur-[120px] pointer-events-none transition-opacity duration-700 opacity-85 group-hover:opacity-100" />
-      <div className="absolute w-[280px] h-[280px] bg-rose-500/15 rounded-full blur-[80px] pointer-events-none animate-pulse" />
+      {/* 1. Deep Atmospheric Cyber Nebula Glow (Adaptive Light & Dark) */}
+      <div className="absolute w-[460px] h-[460px] bg-gradient-to-tr from-rose-300/40 via-pink-300/25 to-rose-200/35 dark:from-[#881337]/40 dark:via-[#e11d48]/20 dark:to-[#4c0519]/35 rounded-full blur-[100px] pointer-events-none transition-opacity duration-700 opacity-85 group-hover:opacity-100" />
+      <div className="absolute w-[280px] h-[280px] bg-rose-400/20 dark:bg-rose-500/15 rounded-full blur-[70px] pointer-events-none animate-pulse" />
 
       {/* 2. 3D Gyroscopic Parallax Tilt Container */}
       <div
@@ -334,22 +383,22 @@ export function SecurityAnimation() {
         }}
       >
         {/* 3. Outer Rotating Orbital Cyber Rings */}
-        <div className="absolute w-[440px] h-[440px] sm:w-[480px] sm:h-[480px] rounded-full border border-rose-500/20 pointer-events-none animate-[spin_40s_linear_infinite]">
+        <div className="absolute w-[440px] h-[440px] sm:w-[480px] sm:h-[480px] rounded-full border border-rose-400/40 dark:border-rose-500/20 pointer-events-none animate-[spin_40s_linear_infinite]">
           {/* Orbital Satellite Node 1 */}
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#170817]/90 border border-rose-500/40 text-[9px] font-mono text-rose-300 shadow-lg shadow-rose-950/60 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 dark:bg-[#170817]/90 border border-rose-300 dark:border-rose-500/40 text-[9px] font-mono text-rose-600 dark:text-rose-300 shadow-md shadow-rose-950/20 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
             <span>NEURAL GATEWAY</span>
           </div>
 
           {/* Orbital Satellite Node 2 */}
-          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#170817]/90 border border-rose-500/40 text-[9px] font-mono text-rose-300 shadow-lg shadow-rose-950/60 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 dark:bg-[#170817]/90 border border-rose-300 dark:border-rose-500/40 text-[9px] font-mono text-rose-600 dark:text-rose-300 shadow-md shadow-rose-950/20 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
             <span>RAG SENTINEL</span>
           </div>
         </div>
 
         {/* Counter-rotating Inner Dashed Defense Ring */}
-        <div className="absolute w-[350px] h-[350px] sm:w-[390px] sm:h-[390px] rounded-full border border-dashed border-rose-500/25 pointer-events-none animate-[spin_55s_linear_infinite_reverse]" />
+        <div className="absolute w-[350px] h-[350px] sm:w-[390px] sm:h-[390px] rounded-full border border-dashed border-rose-400/40 dark:border-rose-500/25 pointer-events-none animate-[spin_55s_linear_infinite_reverse]" />
 
         {/* 4. Canvas: Hexagonal Forcefield & Particle Deflection */}
         <canvas
@@ -362,10 +411,10 @@ export function SecurityAnimation() {
           className="relative w-[280px] sm:w-[330px] h-[320px] sm:h-[380px] flex items-center justify-center z-20 animate-[floatShield_6s_ease-in-out_infinite]"
           style={{ transform: 'translateZ(25px)' }}
         >
-          {/* Pure Vector Cyber Shield SVG with metallic crystalline shading */}
+          {/* Pure Vector Cyber Shield SVG */}
           <svg
             viewBox="0 0 320 380"
-            className="w-full h-full filter drop-shadow-[0_20px_50px_rgba(244,63,94,0.45)] group-hover:drop-shadow-[0_25px_65px_rgba(244,63,94,0.65)] transition-all duration-500 select-none pointer-events-none"
+            className="w-full h-full filter drop-shadow-[0_20px_50px_rgba(225,29,72,0.4)] group-hover:drop-shadow-[0_25px_65px_rgba(225,29,72,0.6)] transition-all duration-500 select-none pointer-events-none"
           >
             <defs>
               {/* Outer Shield Gradient */}
@@ -378,9 +427,9 @@ export function SecurityAnimation() {
 
               {/* Inner Plate Metallic Inset Gradient */}
               <linearGradient id="innerPlateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#1e0a16" />
-                <stop offset="50%" stopColor="#140612" />
-                <stop offset="100%" stopColor="#0a0208" />
+                <stop offset="0%" stopColor="#240c1b" />
+                <stop offset="50%" stopColor="#180715" />
+                <stop offset="100%" stopColor="#0d020b" />
               </linearGradient>
 
               {/* Glowing Rim Gradient */}
@@ -402,7 +451,7 @@ export function SecurityAnimation() {
             <path
               d="M 160 20 L 280 65 L 260 220 C 240 290 190 335 160 360 C 130 335 80 290 60 220 L 40 65 Z"
               fill="none"
-              stroke="rgba(244,63,94,0.35)"
+              stroke="rgba(244,63,94,0.4)"
               strokeWidth="10"
               filter="blur(6px)"
             />
@@ -415,34 +464,34 @@ export function SecurityAnimation() {
               strokeWidth="2.5"
             />
 
-            {/* Layer 3: Inset Darkened Honeycomb Tech Bed */}
+            {/* Layer 3: Inset Honeycomb Tech Bed */}
             <path
               d="M 160 42 L 255 78 L 238 206 C 220 265 178 304 160 326 C 142 304 100 265 82 206 L 65 78 Z"
               fill="url(#innerPlateGrad)"
-              stroke="rgba(244,63,94,0.3)"
+              stroke="rgba(244,63,94,0.4)"
               strokeWidth="1.5"
             />
 
-            {/* Layer 4: Intricate Sci-Fi Geometric Facets (Left & Right Flanges) */}
+            {/* Layer 4: Geometric Facets */}
             {/* Left Flange */}
             <polygon
               points="160,45 80,82 95,200 160,280 160,45"
-              fill="rgba(244,63,94,0.06)"
-              stroke="rgba(244,63,94,0.25)"
+              fill="rgba(244,63,94,0.12)"
+              stroke="rgba(244,63,94,0.35)"
               strokeWidth="1"
             />
             {/* Right Flange */}
             <polygon
               points="160,45 240,82 225,200 160,280 160,45"
-              fill="rgba(244,63,94,0.12)"
-              stroke="rgba(244,63,94,0.35)"
+              fill="rgba(244,63,94,0.18)"
+              stroke="rgba(244,63,94,0.45)"
               strokeWidth="1"
             />
 
-            {/* Layer 5: Glowing Center AI Crest & Crosshairs */}
+            {/* Layer 5: Centerpiece AI Crest & Crosshairs */}
             <g transform="translate(160, 160)">
               {/* Central Glowing Shield Crest */}
-              <circle r="36" fill="rgba(244,63,94,0.15)" stroke="rgba(244,63,94,0.6)" strokeWidth="1.5" />
+              <circle r="36" fill="rgba(244,63,94,0.2)" stroke="rgba(244,63,94,0.7)" strokeWidth="1.5" />
               <circle r="26" fill="rgba(20,5,18,0.9)" stroke="#f43f5e" strokeWidth="2" />
               
               {/* Radar Crosshair ticks */}

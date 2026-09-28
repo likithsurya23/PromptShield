@@ -11,8 +11,17 @@ import { RiskBreakdownDonut } from '@/components/rag/RiskBreakdownDonut';
 import { SuspiciousChunksTable } from '@/components/rag/SuspiciousChunksTable';
 import { DocumentPreviewCard } from '@/components/rag/DocumentPreviewCard';
 import { RemediationFooter } from '@/components/rag/RemediationFooter';
-import { scanDocumentChunks, sanitizeDocument } from '@/lib/rag';
-import { FileText, BookOpen, CheckCircle2 } from 'lucide-react';
+import { scanDocumentWithStages, sanitizeDocument} from '@/lib/rag';
+import { FileText, BookOpen, CheckCircle2, ShieldAlert} from 'lucide-react';
+
+const INITIAL_STEPS = [
+  { id: 1, title: 'Document Upload & Validation', status: 'pending', detail: 'Awaiting document input' },
+  { id: 2, title: 'Content Extraction & Normalization', status: 'pending', detail: 'Text stream and character parsing' },
+  { id: 3, title: 'Content Analysis & Chunking', status: 'pending', detail: 'Configuring chunk slices and link analysis' },
+  { id: 4, title: 'Threat Detection (Neural & Rules)', status: 'pending', detail: 'DistilBERT ML model & adversarial rules' },
+  { id: 5, title: 'Security Validation & Policy Evaluation', status: 'pending', detail: 'Enforcing detection thresholds and indirect injection flags' },
+  { id: 6, title: 'Scan Completion & Synthesis', status: 'pending', detail: 'Risk categorization and remediation synthesis' },
+];
 
 export default function RagSecurityPage() {
   const [data, setData] = useState(null);
@@ -27,14 +36,8 @@ export default function RagSecurityPage() {
   });
   const [progress, setProgress] = useState({
     percent: 0,
-    status: 'Ready',
-    steps: [
-      { id: 1, title: 'Document Parsing', status: 'pending' },
-      { id: 2, title: 'Chunk Segmentation', status: 'pending' },
-      { id: 3, title: 'DistilBERT Neural Classification', status: 'pending' },
-      { id: 4, title: 'Rule & Heuristic Checks', status: 'pending' },
-      { id: 5, title: 'Risk Aggregation', status: 'pending' },
-    ],
+    status: 'Ready to Scan',
+    steps: INITIAL_STEPS,
   });
   const [scanning, setScanning] = useState(false);
   const [selectedChunk, setSelectedChunk] = useState(null);
@@ -55,48 +58,68 @@ export default function RagSecurityPage() {
 
     setScanning(true);
     setSanitized(false);
+    setData(null);
+    setSelectedChunk(null);
+
+    const startTime = Date.now();
+
+    // Reset progress steps to pending
     setProgress({
-      percent: 25,
-      status: 'Parsing document...',
-      steps: [
-        { id: 1, title: 'Document Parsing', status: 'in-progress' },
-        { id: 2, title: 'Chunk Segmentation', status: 'pending' },
-        { id: 3, title: 'DistilBERT Neural Classification', status: 'pending' },
-        { id: 4, title: 'Rule & Heuristic Checks', status: 'pending' },
-        { id: 5, title: 'Risk Aggregation', status: 'pending' },
-      ],
+      percent: 5,
+      status: 'Initializing scan pipeline...',
+      steps: INITIAL_STEPS.map((s) => ({ ...s, status: 'pending', time: null })),
     });
 
     try {
-      setProgress((p) => ({
-        ...p,
-        percent: 50,
-        status: 'Segmenting document chunks...',
-        steps: [
-          { id: 1, title: 'Document Parsing', status: 'completed' },
-          { id: 2, title: 'Chunk Segmentation', status: 'in-progress' },
-          { id: 3, title: 'DistilBERT Neural Classification', status: 'pending' },
-          { id: 4, title: 'Rule & Heuristic Checks', status: 'pending' },
-          { id: 5, title: 'Risk Aggregation', status: 'pending' },
-        ],
-      }));
+      const scanResult = await scanDocumentWithStages(
+        file.name,
+        file.text,
+        config,
+        (update) => {
+          const elapsed = `${Date.now() - startTime}ms`;
+          setProgress((prev) => {
+            const nextSteps = prev.steps.map((step) => {
+              if (step.id < update.stageId) {
+                return {
+                  ...step,
+                  status: 'completed',
+                  time: step.time || elapsed,
+                };
+              } else if (step.id === update.stageId) {
+                return {
+                  ...step,
+                  status: update.percent === 100 ? 'completed' : 'in-progress',
+                  detail: update.detail || step.detail,
+                  time: update.percent === 100 ? elapsed : null,
+                };
+              } else {
+                return { ...step, status: 'pending' };
+              }
+            });
 
-      const scanResult = await scanDocumentChunks(file.name, file.text, config);
+            return {
+              percent: update.percent,
+              status: update.status,
+              steps: nextSteps,
+            };
+          });
+        }
+      );
 
-      setProgress((p) => ({
-        ...p,
-        percent: 85,
-        status: 'Neural classification complete...',
-        steps: [
-          { id: 1, title: 'Document Parsing', status: 'completed' },
-          { id: 2, title: 'Chunk Segmentation', status: 'completed' },
-          { id: 3, title: 'DistilBERT Neural Classification', status: 'completed' },
-          { id: 4, title: 'Rule & Heuristic Checks', status: 'completed' },
-          { id: 5, title: 'Risk Aggregation', status: 'in-progress' },
-        ],
-      }));
+      // Finalize progress
+      const totalElapsed = `${Date.now() - startTime}ms`;
+      setProgress({
+        percent: 100,
+        status: 'Scan Completed',
+        steps: INITIAL_STEPS.map((s) => ({
+          ...s,
+          status: 'completed',
+          time: s.id === 6 ? totalElapsed : '✓',
+        })),
+      });
 
       setData(scanResult);
+
       if (scanResult.suspiciousChunks?.length > 0) {
         setSelectedChunk(scanResult.suspiciousChunks[0]);
         showToast(
@@ -106,21 +129,13 @@ export default function RagSecurityPage() {
         setSelectedChunk(null);
         showToast('Scan completed: Document is clean of prompt injection threats.');
       }
-
-      setProgress({
-        percent: 100,
-        status: 'Completed',
-        steps: [
-          { id: 1, title: 'Document Parsing', status: 'completed' },
-          { id: 2, title: 'Chunk Segmentation', status: 'completed' },
-          { id: 3, title: 'DistilBERT Neural Classification', status: 'completed' },
-          { id: 4, title: 'Rule & Heuristic Checks', status: 'completed' },
-          { id: 5, title: 'Risk Aggregation', status: 'completed' },
-        ],
-      });
     } catch (err) {
       console.error('RAG scan failed:', err);
-      setProgress((p) => ({ ...p, status: 'Error scanning document' }));
+      setProgress((prev) => ({
+        ...prev,
+        status: `Scan Error: ${err.message}`,
+        steps: prev.steps.map((s) => (s.status === 'in-progress' ? { ...s, status: 'error' } : s)),
+      }));
       showToast('Scan failed: ' + err.message);
     } finally {
       setScanning(false);
@@ -154,7 +169,8 @@ export default function RagSecurityPage() {
   const handleDownloadReport = () => {
     if (!data) return;
     const reportData = {
-      document: file?.name,
+      document: data.document || file?.name,
+      config: data.config,
       results: data.results,
       suspicious_chunks: data.suspiciousChunks,
       sanitized,
@@ -185,14 +201,14 @@ export default function RagSecurityPage() {
         </div>
       )}
 
-      {/* Page Header */}
+      {/* Page Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83]">
-            <FileText className="w-6 h-6" />
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
+          <div className="p-2.5 rounded-xl bg-[#1a0e1c] border border-rose-500/30 text-[#f57b83] shrink-0">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               RAG Document Security
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -212,7 +228,7 @@ export default function RagSecurityPage() {
         </div>
       </div>
 
-      {/* Top 3-Column Section */}
+      {/* Top 3-Column Section: Upload, Config, Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5 items-stretch">
         <div className="lg:col-span-4">
           <DocumentUploadCard
@@ -233,6 +249,39 @@ export default function RagSecurityPage() {
       {/* Results Section */}
       {data && (
         <div className="space-y-5 animate-fade-in">
+          {/* Detected Issues Banner */}
+          {data.results.detectedIssues?.length > 0 && (
+            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-xs font-bold text-rose-300">
+                    Security Findings: {data.results.detectedIssues.length} Threat Pattern(s) Detected
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mt-1.5">
+                    {data.results.detectedIssues.map((issue, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-rose-950/70 border border-rose-800/60 text-rose-200"
+                      >
+                        {issue.title} {issue.count > 1 ? `(${issue.count}x)` : ''}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="shrink-0">
+                <button
+                  type="button"
+                  onClick={handleSanitize}
+                  className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
+                >
+                  Sanitize & Download
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             <div className="lg:col-span-7">
               <ScanResultsOverview results={data.results} />
@@ -252,7 +301,6 @@ export default function RagSecurityPage() {
             </div>
             <div className="lg:col-span-5">
               <DocumentPreviewCard
-                documentText={sanitized ? sanitizedText : file?.text}
                 selectedChunk={selectedChunk}
                 sanitized={sanitized}
               />

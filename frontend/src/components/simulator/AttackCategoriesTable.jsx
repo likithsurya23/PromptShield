@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { ArrowRight, Zap, FileText, AlertTriangle, Shield, Users, Cpu, FileCode } from 'lucide-react';
+import { ArrowRight, Zap, FileText, AlertTriangle, Shield, Users, Cpu, FileCode, Sparkles } from 'lucide-react';
 
 export function AttackCategoriesTable({ categories = [], onViewAll }) {
   const getCategoryIcon = (iconName, color) => {
     const iconClass = 'w-3.5 h-3.5';
     switch (iconName) {
+      case 'sparkles':
+        return <Sparkles className={iconClass} style={{ color }} />;
       case 'zap':
         return <Zap className={iconClass} style={{ color }} />;
       case 'file-text':

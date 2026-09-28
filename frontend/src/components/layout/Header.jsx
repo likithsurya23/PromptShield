@@ -19,6 +19,7 @@ import {
   Settings as SettingsIcon,
   Sun,
   Moon,
+  Menu,
 } from 'lucide-react';
 import { removeStoredToken } from '@/lib/auth';
 import {
@@ -32,7 +33,7 @@ import {
   applyAppearance,
 } from '@/lib/settings';
 
-export function Header({ onOpenSearch }) {
+export function Header({ onOpenSearch, onOpenMobileSidebar }) {
   const router = useRouter();
   const [profile, setProfile] = useState(DEFAULT_SETTINGS.profile);
   const [notifications, setNotifications] = useState([]);
@@ -133,25 +134,38 @@ export function Header({ onOpenSearch }) {
   const isLight = appearance?.theme === 'Light';
 
   return (
-    <header className="h-16 px-8 border-b border-[#26131c] bg-[#0b080e]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-30 transition-colors">
-      {/* Search Bar matching wireframe */}
-      <div className="w-full max-w-md">
+    <header className="h-16 px-3 sm:px-6 md:px-8 border-b border-[#26131c] bg-[#0b080e]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-30 transition-colors gap-2 sm:gap-4">
+      {/* Search Bar matching wireframe with mobile menu toggle */}
+      <div className="flex items-center gap-2 flex-1 max-w-md min-w-0">
+        {onOpenMobileSidebar && (
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 transition-colors shrink-0 cursor-pointer"
+            aria-label="Open mobile navigation menu"
+            title="Open Menu"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
+
         <div
           onClick={onOpenSearch}
-          className="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-400 cursor-pointer transition-all shadow-inner group"
+          className="flex-1 flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-400 cursor-pointer transition-all shadow-inner group min-w-0"
         >
-          <Search className="w-4 h-4 text-slate-400 group-hover:text-rose-300" />
-          <span className="text-xs text-slate-400 group-hover:text-rose-200 flex-1 select-none">
-            Search scans, prompts, reports...
+          <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-hover:text-rose-300 shrink-0" />
+          <span className="text-xs text-slate-400 group-hover:text-rose-200 truncate select-none">
+            <span className="hidden sm:inline">Search scans, prompts, reports...</span>
+            <span className="sm:hidden text-[11px]">Search...</span>
           </span>
-          <kbd className="text-[10px] font-medium tracking-wide bg-[#220f1e] border border-rose-900/40 px-2 py-0.5 rounded text-rose-300">
+          <kbd className="hidden sm:inline-block text-[10px] font-medium tracking-wide bg-[#220f1e] border border-rose-900/40 px-2 py-0.5 rounded text-rose-300 shrink-0">
             Ctrl K
           </kbd>
         </div>
       </div>
 
       {/* Right User Controls */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         {/* Quick Theme Toggle */}
         <button
           type="button"
@@ -161,9 +175,9 @@ export function Header({ onOpenSearch }) {
           title={isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
         >
           {isLight ? (
-            <Sun className="w-5 h-5 text-amber-500 transition-transform hover:rotate-45" />
+            <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 transition-transform hover:rotate-45" />
           ) : (
-            <Moon className="w-5 h-5 text-blue-400 transition-transform hover:-rotate-12" />
+            <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 transition-transform hover:-rotate-12" />
           )}
         </button>
 
@@ -174,7 +188,7 @@ export function Header({ onOpenSearch }) {
             className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a0e1c] transition-colors cursor-pointer"
             title="Notifications"
           >
-            <Bell className="w-5 h-5" />
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             {unreadCount > 0 && (
               <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f43f5e] opacity-75"></span>
@@ -184,7 +198,7 @@ export function Header({ onOpenSearch }) {
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black z-50 overflow-hidden animate-fade-in">
+            <div className="absolute right-0 mt-2 w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black z-50 overflow-hidden animate-fade-in">
               <div className="p-3.5 border-b border-[#2c1622] flex items-center justify-between bg-[#0e0710]/90">
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs font-bold text-white tracking-tight">Security Notifications</h3>

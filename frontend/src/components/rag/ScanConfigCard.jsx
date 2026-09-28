@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Sliders, Shield, Zap, Sparkles, CheckCircle2 } from 'lucide-react';
+import { SCAN_PRESETS } from '@/lib/rag';
 
 export function ScanConfigCard({ config, setConfig }) {
   const modes = [
@@ -11,15 +12,42 @@ export function ScanConfigCard({ config, setConfig }) {
     'Enterprise Compliance',
   ];
 
+  const handleModeChange = (modeName) => {
+    const preset = SCAN_PRESETS[modeName];
+    if (preset) {
+      setConfig((prev) => ({
+        ...prev,
+        detectionMode: modeName,
+        chunkSize: preset.chunkSize,
+        chunkOverlap: preset.chunkOverlap,
+        detectIndirect: preset.detectIndirect,
+        detectObfuscated: preset.detectObfuscated,
+        analyzeLinks: preset.analyzeLinks,
+      }));
+    } else {
+      setConfig((prev) => ({ ...prev, detectionMode: modeName }));
+    }
+  };
+
+  const currentPreset = SCAN_PRESETS[config.detectionMode] || SCAN_PRESETS['Standard (Recommended)'];
+
   return (
     <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">
       <div>
-        <h2 className="text-sm font-semibold text-white mb-3">
-          2. Scan Configuration
-        </h2>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-sm font-semibold text-white">
+            2. Scan Configuration
+          </h2>
+          <span className={`text-[10px] border px-2 py-0.5 rounded-full font-medium ${currentPreset.badgeColor}`}>
+            {currentPreset.badge}
+          </span>
+        </div>
+        <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
+          Configure chunk parameters, detection sensitivity, and rule enforcement pipelines.
+        </p>
 
         {/* 3 Inputs in a Row */}
-        <div className="grid grid-cols-3 gap-2.5 mb-4">
+        <div className="grid grid-cols-3 gap-2.5 mb-3.5">
           {/* Chunk Size */}
           <div className="space-y-1">
             <label className="text-[10px] font-medium text-slate-400 block">
@@ -28,9 +56,11 @@ export function ScanConfigCard({ config, setConfig }) {
             <input
               type="number"
               step="50"
+              min="100"
+              max="2000"
               value={config.chunkSize}
               onChange={(e) =>
-                setConfig({ ...config, chunkSize: parseInt(e.target.value) || 500 })
+                setConfig({ ...config, chunkSize: parseInt(e.target.value) || 400 })
               }
               className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-1.5 px-2.5 text-xs font-mono font-semibold text-white focus:outline-none focus:border-blue-500"
             />
@@ -44,6 +74,8 @@ export function ScanConfigCard({ config, setConfig }) {
             <input
               type="number"
               step="10"
+              min="0"
+              max="500"
               value={config.chunkOverlap}
               onChange={(e) =>
                 setConfig({ ...config, chunkOverlap: parseInt(e.target.value) || 50 })
@@ -60,9 +92,7 @@ export function ScanConfigCard({ config, setConfig }) {
             <div className="relative">
               <select
                 value={config.detectionMode}
-                onChange={(e) =>
-                  setConfig({ ...config, detectionMode: e.target.value })
-                }
+                onChange={(e) => handleModeChange(e.target.value)}
                 className="w-full bg-[#080d19] border border-slate-800 rounded-xl py-1.5 px-2 pr-6 text-[11px] font-semibold text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer truncate"
               >
                 {modes.map((m) => (
@@ -77,7 +107,7 @@ export function ScanConfigCard({ config, setConfig }) {
         </div>
 
         {/* 3 Toggle Switches */}
-        <div className="space-y-3 pt-1">
+        <div className="space-y-2.5 pt-0.5 mb-3.5">
           {/* Toggle 1: Detect indirect prompt injections */}
           <div className="flex items-start justify-between gap-3">
             <div
@@ -99,7 +129,7 @@ export function ScanConfigCard({ config, setConfig }) {
                 Detect indirect prompt injections
               </span>
               <span className="text-[10px] text-slate-400">
-                Find hidden malicious instructions
+                Find hidden instructions, jailbreak prefixes, and system overrides
               </span>
             </div>
           </div>
@@ -125,7 +155,7 @@ export function ScanConfigCard({ config, setConfig }) {
                 Check for obfuscated content
               </span>
               <span className="text-[10px] text-slate-400">
-                Detect encoded or disguised prompts
+                Detect Base64 payloads, hex encoding, zero-width chars & leetspeak
               </span>
             </div>
           </div>
@@ -151,9 +181,45 @@ export function ScanConfigCard({ config, setConfig }) {
                 Analyze external links
               </span>
               <span className="text-[10px] text-slate-400">
-                Scan URLs and referenced content
+                Audit URLs, webhooks, and exfiltration endpoints in document text
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Predefined Scanning Stages & Instructions Banner */}
+        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            <span>Predefined Instructions & Pipeline:</span>
+          </div>
+
+          <p className="text-[10px] text-slate-400 leading-relaxed">
+            {currentPreset.description}
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 pt-0.5">
+            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[#080d19] border border-slate-800 text-slate-300">
+              Chunk: {config.chunkSize} / {config.chunkOverlap} overlap
+            </span>
+            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[#080d19] border border-slate-800 text-slate-300">
+              Thresholds: Allow &lt;{currentPreset.allowThreshold}, Block &gt;{currentPreset.blockThreshold}
+            </span>
+            {config.detectIndirect && (
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                Indirect Filter
+              </span>
+            )}
+            {config.detectObfuscated && (
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                Obfuscation Decoder
+              </span>
+            )}
+            {config.analyzeLinks && (
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                Link Analyzer
+              </span>
+            )}
           </div>
         </div>
       </div>

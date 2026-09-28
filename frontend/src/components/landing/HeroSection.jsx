@@ -47,33 +47,33 @@ export function HeroSection() {
           <div className="lg:col-span-6 space-y-6 text-left">
             {/* Pill Tag */}
             <div>
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-500/30 bg-[#1e0a14]/80 text-[#f57b83] text-[11px] font-semibold tracking-wider uppercase shadow-inner">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-[#1e0a14]/80 text-rose-600 dark:text-[#f57b83] text-[11px] font-semibold tracking-wider uppercase shadow-sm dark:shadow-inner">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#f43f5e] animate-pulse" />
                 <span>AI SECURITY FOR A SAFER TOMORROW</span>
               </span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12]">
+            <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12]">
               Stop Prompt<br />
               Injection Before<br />
               It Reaches{' '}
-              <span className="bg-gradient-to-r from-[#f57b83] via-[#e11d48] to-[#fdc6cb] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#be123c] dark:from-[#f57b83] dark:via-[#e11d48] dark:to-[#fdc6cb] bg-clip-text text-transparent">
                 Your LLM
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-lg">
+            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-lg">
               PromptShield uses advanced machine learning and rule-based detection to
               analyze and block malicious prompts in real time.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-sm font-semibold transition-all shadow-lg shadow-rose-950/40 active:scale-95 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-sm font-semibold transition-all shadow-lg shadow-rose-900/35 active:scale-95 cursor-pointer text-center"
               >
                 <span>Get Started</span>
                 <ArrowRight className="w-4 h-4" />
@@ -81,10 +81,10 @@ export function HeroSection() {
 
               <a
                 href="#how-it-works"
-                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl border border-rose-900/40 hover:border-rose-500/40 bg-[#140b12]/80 hover:bg-[#1f101c] text-white text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl border border-slate-300 dark:border-rose-900/40 hover:border-rose-400 dark:hover:border-rose-500/40 bg-white/90 dark:bg-[#140b12]/80 hover:bg-slate-50 dark:hover:bg-[#1f101c] text-slate-800 dark:text-white text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer text-center"
               >
-                <div className="w-5 h-5 rounded-full bg-rose-500/20 flex items-center justify-center text-[#f57b83]">
-                  <Play className="w-2.5 h-2.5 fill-[#f57b83] ml-0.5" />
+                <div className="w-5 h-5 rounded-full bg-rose-500/15 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-[#f57b83]">
+                  <Play className="w-2.5 h-2.5 fill-rose-600 dark:fill-[#f57b83] ml-0.5" />
                 </div>
                 <span>Learn More</span>
               </a>
@@ -92,31 +92,31 @@ export function HeroSection() {
           </div>
 
           {/* Right Column: 3D Animated Security Shield */}
-          <div className="lg:col-span-6 relative flex items-center justify-center">
+          <div className="lg:col-span-6 relative flex items-center justify-center overflow-hidden w-full">
             <SecurityAnimation />
           </div>
 
         </div>
 
         {/* Bottom Feature Badges Bar */}
-        <div className="mt-14 sm:mt-18 pt-8 border-t border-rose-950/40">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div className="mt-10 sm:mt-18 pt-6 sm:pt-8 border-t border-slate-200 dark:border-rose-950/40">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {bottomFeatures.map((item, idx) => {
               const Icon = item.icon;
               return (
                 <div
                   key={idx}
-                  className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-[#130b14]/70 border border-rose-950/60 hover:border-rose-500/30 transition-all group"
+                  className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/80 dark:bg-[#130b14]/70 border border-slate-200 dark:border-rose-950/60 hover:border-rose-400 dark:hover:border-rose-500/30 transition-all group shadow-sm dark:shadow-none"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#1a0e1c] border border-rose-500/25 text-[#f57b83] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-inner">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-[#1a0e1c] border border-rose-200 dark:border-rose-500/25 text-rose-600 dark:text-[#f57b83] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                     <Icon className="w-5 h-5 stroke-[1.8]" />
                   </div>
                   <div className="text-left leading-tight">
-                    <span className="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white block">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white block">
                       {item.title}
                     </span>
                     {item.subtitle && (
-                      <span className="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white block">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white block">
                         {item.subtitle}
                       </span>
                     )}
