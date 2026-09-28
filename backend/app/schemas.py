@@ -74,33 +74,6 @@ class UserLoginRequest(BaseModel):
     password: str = Field(..., json_schema_extra={"example": "promptshield123"})
 
 
-class SocialLoginRequest(BaseModel):
-    provider: str = Field(..., description="OAuth provider: 'google' or 'github'", json_schema_extra={"example": "google"})
-    email: str = Field(..., description="User email from OAuth provider", json_schema_extra={"example": "developer@gmail.com"})
-    name: Optional[str] = Field(None, description="User full name or display name", json_schema_extra={"example": "Dev User"})
-    avatar_url: Optional[str] = Field(None, description="User avatar image URL")
-    token: Optional[str] = Field(None, description="OAuth token, id_token, or code")
-    state: Optional[str] = Field(None, description="Anti-CSRF state token")
-
-
-class OAuthExchangeRequest(BaseModel):
-    code: str = Field(..., description="Authorization code returned by OAuth provider")
-    redirect_uri: Optional[str] = Field(None, description="Callback redirect URI used in auth request")
-    client_id: Optional[str] = Field(None, description="Optional custom client_id provided by frontend")
-    client_secret: Optional[str] = Field(None, description="Optional custom client_secret provided by frontend")
-    id_token: Optional[str] = Field(None, description="Google OpenID Connect id_token if provided")
-
-
-class GitHubTokenLoginRequest(BaseModel):
-    token: str = Field(..., description="GitHub Personal Access Token (classic or fine-grained)")
-
-
-class OAuthConfigResponse(BaseModel):
-    github_client_id: Optional[str] = None
-    google_client_id: Optional[str] = None
-    callback_url: str
-
-
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -113,6 +86,17 @@ class UserResponse(BaseModel):
     name: Optional[str] = None
     email: str
     role: str = "user"
+
+
+class UserProfileUpdateRequest(BaseModel):
+    username: Optional[str] = Field(None, min_length=2, max_length=50)
+    name: Optional[str] = Field(None, max_length=100)
+    email: Optional[str] = Field(None, pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+
+
+class UserPasswordUpdateRequest(BaseModel):
+    current_password: str = Field(..., min_length=1, description="Current existing password")
+    new_password: str = Field(..., min_length=6, max_length=128, description="New replacement password")
 
 
 class AnalyticsSummaryResponse(BaseModel):

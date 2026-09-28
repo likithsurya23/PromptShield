@@ -83,59 +83,165 @@ class UserService:
             return None
         return user
 
-    async def find_or_create_social_user(
+
+
+    async def update_user_profile(
         self,
-        provider: str,
-        email: str,
+        current_identifier: str,
+        new_username: Optional[str] = None,
         name: Optional[str] = None,
-        avatar_url: Optional[str] = None
+        email: Optional[str] = None
     ) -> Dict[str, Any]:
+        """
+        Update user profile in MongoDB and in-memory cache.
+        Checks for username and email uniqueness collisions.
+        """
         await db_manager.ensure_connected()
-        existing_user = await self.get_user_by_email(email)
+        user = await self.get_user_by_username(current_identifier)
+        if not user:
+            user = await self.get_user_by_email(current_identifier)
+        if not user:
+            raise ValueError(f"User '{current_identifier}' not found.")
+
+        old_username = user.get("username", current_identifier)
+        user_id = user.get("id")
+
+        updated_username = (new_username or "").strip() or old_username
+        updated_email = (email or "").strip() or user.get("email", "")
+        updated_name = (name or "").strip() or user.get("name", updated_username)
+
+        # Check username collision
+        if updated_username != old_username:
+            conflict = await self.get_user_by_username(updated_username)
+            if conflict and conflict.get("id") != user_id:
+                raise ValueError(f"Username '{updated_username}' is already taken.")
+
+        # Check email collision
+        if updated_email != user.get("email"):
+            conflict_email = await self.get_user_by_email(updated_email)
+            if conflict_email and conflict_email.get("id") != user_id:
+                raise ValueError(f"Email '{updated_email}' is already in use by another account.")
+
         now = datetime.now(timezone.utc)
-        if existing_user:
-            if db_manager.is_connected and db_manager.db is not None:
-                await db_manager.db.users.update_one(
-                    {"email": email},
-                    {"$set": {"last_login_at": now, "auth_provider": provider, "avatar_url": avatar_url}}
-                )
-            existing_user["last_login_at"] = now
-            existing_user["auth_provider"] = provider
-            if avatar_url:
-                existing_user["avatar_url"] = avatar_url
-            return existing_user
-
-        import re
-        import secrets
-
-        base_username = (email.split("@")[0] if "@" in email else (name or "user")).lower()
-        clean_username = re.sub(r"[^a-zA-Z0-9_]", "_", base_username)
-        collision = await self.get_user_by_username(clean_username)
-        if collision:
-            clean_username = f"{clean_username}_{secrets.token_hex(2)}"
-
-        random_secret = secrets.token_urlsafe(32)
-        hashed_password = get_password_hash(random_secret)
-
-        user_doc = {
-            "username": clean_username,
-            "email": email,
-            "hashed_password": hashed_password,
-            "role": "user",
-            "auth_provider": provider,
-            "avatar_url": avatar_url,
-            "created_at": now,
-            "last_login_at": now,
+        update_fields = {
+            "username": updated_username,
+            "name": updated_name,
+            "email": updated_email,
+            "updated_at": now
         }
 
+        # 1. Update in MongoDB
         if db_manager.is_connected and db_manager.db is not None:
-            result = await db_manager.db.users.insert_one(user_doc)
-            user_doc["id"] = str(result.inserted_id)
-            return user_doc
-        else:
-            user_doc["id"] = clean_username
-            _MEMORY_USERS[clean_username] = user_doc
-            return user_doc
+            await db_manager.db.users.update_one(
+                {"username": old_username},
+                {"$set": update_fields}
+            )
+            # If username changed, update scan logs user_id as well
+            if updated_username != old_username:
+                await db_manager.db.scan_logs.update_many(
+                    {"user_id": old_username},
+                    {"$set": {"user_id": updated_username}}
+                )
+
+        # 2. Update in-memory fallback
+        if old_username in _MEMORY_USERS:
+            mem_user = _MEMORY_USERS.pop(old_username)
+            mem_user.update(update_fields)
+            _MEMORY_USERS[updated_username] = mem_user
+
+        user.update(update_fields)
+        return user
+
+    async def update_user_password(
+        self,
+        username_or_email: str,
+        current_password: str,
+        new_password: str
+    ) -> bool:
+        """
+        Verify current password and update hashed password in MongoDB and memory.
+        """
+        await db_manager.ensure_connected()
+        user = await self.get_user_by_username(username_or_email)
+        if not user:
+            user = await self.get_user_by_email(username_or_email)
+        if not user:
+            raise ValueError("User not found.")
+
+        # Verify current password
+        stored_hash = user.get("hashed_password")
+        if not stored_hash or not verify_password(current_password, stored_hash):
+            raise ValueError("Current password is incorrect.")
+
+        new_hash = get_password_hash(new_password)
+        now = datetime.now(timezone.utc)
+
+        # 1. Update MongoDB
+        if db_manager.is_connected and db_manager.db is not None:
+            await db_manager.db.users.update_one(
+                {"username": user["username"]},
+                {"$set": {"hashed_password": new_hash, "updated_at": now}}
+            )
+
+        # 2. Update memory store
+        username = user["username"]
+        if username in _MEMORY_USERS:
+            _MEMORY_USERS[username]["hashed_password"] = new_hash
+            _MEMORY_USERS[username]["updated_at"] = now
+
+        user["hashed_password"] = new_hash
+        return True
+
+    async def delete_user(self, username_or_email: str) -> bool:
+        """
+        Permanently delete a user account and all associated data
+        (scans, audit logs, memory records) from MongoDB and memory.
+        """
+        await db_manager.ensure_connected()
+        user = await self.get_user_by_username(username_or_email)
+        if not user:
+            user = await self.get_user_by_email(username_or_email)
+
+        username = user.get("username", username_or_email) if user else username_or_email
+        email = user.get("email") if user else None
+        user_id = user.get("id") if user else None
+
+        # 1. Delete from MongoDB users and scan_logs
+        if db_manager.is_connected and db_manager.db is not None:
+            user_filters = [{"username": username}]
+            if email:
+                user_filters.append({"email": email})
+            if user_id:
+                try:
+                    from bson import ObjectId
+                    user_filters.append({"_id": ObjectId(user_id)})
+                except Exception:
+                    pass
+                user_filters.append({"id": user_id})
+
+            await db_manager.db.users.delete_many({"$or": user_filters})
+
+            # Delete all scan logs associated with this user
+            scan_filters = [{"user_id": username}]
+            if user_id:
+                scan_filters.append({"user_id": str(user_id)})
+            if email:
+                scan_filters.append({"user_id": email})
+
+            await db_manager.db.scan_logs.delete_many({"$or": scan_filters})
+            logger.info(f"Permanently deleted user '{username}' and associated scan logs from MongoDB.")
+
+        # 2. Delete from in-memory stores
+        keys_to_remove = [k for k, v in _MEMORY_USERS.items() if k == username or v.get("email") == email or v.get("id") == user_id]
+        for k in keys_to_remove:
+            _MEMORY_USERS.pop(k, None)
+
+        db_manager.memory_scans = [
+            s for s in db_manager.memory_scans
+            if s.get("user_id") not in (username, email, user_id)
+        ]
+        logger.info(f"Permanently cleared user '{username}' from memory stores.")
+        return True
 
 
 user_service = UserService()
