@@ -49,7 +49,7 @@ export function LandingFooter() {
         </div>
 
         {/* Copyright */}
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-slate-400">
           © 2026 PromptShield. All rights reserved.
         </p>
       </div>

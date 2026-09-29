@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { User, Mail, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { registerWithCredentials } from '@/lib/auth';
 
 export function RegisterForm() {
