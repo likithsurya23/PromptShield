@@ -1,4 +1,5 @@
 import './globals.css';
+import Loader from '@/components/ui/Loader';
 
 export const metadata = {
   title: 'PromptShield - AI Security & Defense Dashboard',
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-screen bg-[#0b080e] text-slate-100 antialiased selection:bg-rose-600/30 selection:text-rose-200">
+        <Loader />
         {children}
       </body>
     </html>

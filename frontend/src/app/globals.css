@@ -651,4 +651,229 @@ textarea {
   scrollbar-width: none;
 }
 
+/* ==========================================================================
+   SHIELD APPLICATION LOADER ANIMATION
+   ========================================================================== */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes scan {
+  0% {
+    left: -100%;
+    transform: skewX(-15deg) translateX(-100%);
+  }
+  20% {
+    left: 100%;
+    transform: skewX(-15deg) translateX(100%);
+  }
+  100% {
+    left: 100%;
+    transform: skewX(-15deg) translateX(100%);
+  }
+}
+@keyframes pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+    border-color: rgba(255, 90, 90, 0.9);
+  }
+  70% {
+    transform: scale(1.15);
+    opacity: 0;
+    border-color: rgba(255, 90, 90, 0.2);
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+    border-color: transparent;
+  }
+}
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+    text-shadow: 0 0 8px #ff6b6b;
+  }
+}
+@keyframes floatShield {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.shield-loader-root {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0508;
+  background-image: radial-gradient(circle at 30% 20%, #2a121a 0%, #0a0406 90%);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.shield-loader-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.shield-shape {
+  position: relative;
+  width: 110px;
+  height: 130px;
+  background: linear-gradient(145deg, #3a1a22, #1a0a0f);
+  clip-path: polygon(50% 0%, 100% 12%, 100% 70%, 50% 100%, 0% 70%, 0% 12%);
+  box-shadow: 0 15px 25px -8px rgba(255, 60, 60, 0.4),
+              inset 0 0 15px rgba(255, 80, 80, 0.3);
+  border: 2px solid rgba(255, 90, 90, 0.7);
+  animation: floatShield 3.2s ease-in-out infinite;
+}
+.shield-shape::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  background: radial-gradient(circle at 30% 25%, #ff3b3b, #4a0f1a);
+  clip-path: polygon(50% 0%, 100% 12%, 100% 70%, 50% 100%, 0% 70%, 0% 12%);
+  opacity: 0.9;
+  box-shadow: inset 0 0 20px #ff5a5a;
+}
+.shield-shape::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 200, 200, 0.5),
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 200, 200, 0.5),
+    transparent);
+  transform: skewX(-15deg) translateX(-100%);
+  animation: scan 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  clip-path: polygon(50% 0%, 100% 12%, 100% 70%, 50% 100%, 0% 70%, 0% 12%);
+  mix-blend-mode: overlay;
+}
+.pulse-ring-el {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 90, 90, 0.6);
+  animation: pulse 2s ease-out infinite;
+  pointer-events: none;
+  opacity: 0;
+}
+.ring-base {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: spin 2s linear infinite;
+}
+.ring-1-el {
+  width: 160px;
+  height: 160px;
+  border-top-color: #ff4d4d;
+  border-right-color: #ff4d4d;
+  animation-duration: 2.2s;
+  opacity: 0.8;
+  box-shadow: 0 0 12px rgba(255, 77, 77, 0.4);
+}
+.ring-2-el {
+  width: 140px;
+  height: 140px;
+  border-top-color: #ff7a7a;
+  border-right-color: #ff7a7a;
+  animation-duration: 1.8s;
+  animation-direction: reverse;
+  opacity: 0.9;
+  box-shadow: 0 0 18px rgba(255, 122, 122, 0.5);
+}
+.ring-3-el {
+  width: 120px;
+  height: 120px;
+  border-top-color: #ffb3b3;
+  border-right-color: #ffb3b3;
+  animation-duration: 1.4s;
+  opacity: 1;
+  box-shadow: 0 0 22px rgba(255, 179, 179, 0.7);
+}
+.loading-text-el {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: #ffb3b3;
+  font-weight: 500;
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(255, 80, 80, 0.8);
+  background: rgba(30, 10, 15, 0.6);
+  padding: 6px 18px;
+  border-radius: 40px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 100, 100, 0.5);
+}
+.loading-text-el span {
+  display: inline-block;
+  animation: dotPulse 1.6s ease-in-out infinite;
+  font-size: 1.4rem;
+  line-height: 0.8;
+  color: #ff6b6b;
+}
+.loading-text-el span:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.loading-text-el span:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@media (max-width: 480px) {
+  .shield-loader-wrap {
+    width: 170px;
+    height: 170px;
+  }
+  .shield-shape {
+    width: 90px;
+    height: 106px;
+  }
+  .ring-1-el { width: 130px; height: 130px; }
+  .ring-2-el { width: 112px; height: 112px; }
+  .ring-3-el { width: 95px; height: 95px; }
+  .loading-text-el {
+    font-size: 0.8rem;
+    padding: 5px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shield-shape,
+  .shield-shape::after,
+  .ring-base,
+  .pulse-ring-el,
+  .loading-text-el span {
+    animation: none !important;
+  }
+  .shield-shape::after {
+    display: none;
+  }
+  .pulse-ring-el {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+
 
