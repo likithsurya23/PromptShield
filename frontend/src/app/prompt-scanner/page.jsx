@@ -48,9 +48,6 @@ export default function PromptScannerPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Prompt Scanner</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Analyze your prompt for potential prompt injection attacks using hybrid ML and rule-based detection.
-          </p>
         </div>
 
         <div>

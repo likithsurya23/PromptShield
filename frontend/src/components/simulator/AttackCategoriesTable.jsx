@@ -30,7 +30,7 @@ export function AttackCategoriesTable({ categories = [], onViewAll }) {
   };
 
   return (
-    <Card className="p-6 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">
+    <Card className="p-4 sm:p-5 md:p-6 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-white">Attack Categories</h2>
@@ -44,8 +44,8 @@ export function AttackCategoriesTable({ categories = [], onViewAll }) {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto -mx-1 sm:mx-0">
+          <table className="w-full min-w-[480px] text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-[11px] text-slate-400 font-medium pb-2">
                 <th className="pb-2.5 font-medium">Category</th>

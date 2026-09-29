@@ -6,32 +6,81 @@ import { ArrowRight } from 'lucide-react';
 
 export function CtaBanner() {
   return (
-    <section className="py-16 sm:py-20 bg-transparent relative overflow-hidden">
+    <section className="py-12 sm:py-20 bg-transparent relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Glow Box Container */}
-        <div className="relative rounded-2xl overflow-hidden border border-rose-300 dark:border-rose-500/35 bg-gradient-to-b from-rose-50/90 via-pink-50/80 to-rose-100/90 dark:from-[#1a0c17]/95 dark:via-[#260f20]/90 dark:to-[#130713]/95 p-6 sm:p-14 text-center shadow-[0_0_50px_-15px_rgba(244,63,94,0.25)] transition-colors">
+        {/* Glow Box Container matching reference image */}
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-rose-500/35 bg-gradient-to-b from-[#180715]/95 via-[#22091d]/90 to-[#0e020b]/98 p-6 xs:p-8 sm:p-14 text-center shadow-[0_0_60px_-10px_rgba(244,63,94,0.3)]">
           
-          {/* Bottom neon red/rose accent glow */}
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-4/5 h-[80px] bg-[#e11d48]/25 dark:bg-[#e11d48]/35 blur-[45px] rounded-full pointer-events-none" />
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/5 h-[40px] bg-[#f57b83]/20 dark:bg-[#f57b83]/30 blur-[25px] rounded-full pointer-events-none" />
+          {/* Deep Ambient Nebula behind the banner */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[120px] bg-rose-600/15 blur-[60px] rounded-full pointer-events-none" />
 
-          <div className="relative z-10 max-w-2xl mx-auto space-y-3.5">
-            <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 dark:text-white tracking-tight">
+          {/* Curved Planetary Laser Horizon Arc at the bottom */}
+          <div className="absolute -bottom-10 inset-x-0 h-44 pointer-events-none overflow-hidden flex items-end justify-center">
+            {/* Ambient Red Horizon Glow */}
+            <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#e11d48]/30 via-rose-600/10 to-transparent blur-2xl" />
+            
+            {/* Vector Curved Dome Laser Horizon */}
+            <svg
+              viewBox="0 0 1000 240"
+              preserveAspectRatio="none"
+              className="w-full h-44 drop-shadow-[0_0_15px_rgba(244,63,94,0.8)] opacity-85"
+            >
+              <defs>
+                <linearGradient id="horizonLaser" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#881337" stopOpacity="0.1" />
+                  <stop offset="25%" stopColor="#f43f5e" stopOpacity="0.8" />
+                  <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
+                  <stop offset="75%" stopColor="#f43f5e" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#881337" stopOpacity="0.1" />
+                </linearGradient>
+                <linearGradient id="horizonMesh" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#e11d48" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#0e020b" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+
+              {/* Curved Horizon Underbody Mesh */}
+              <path
+                d="M -100 240 Q 500 20 1100 240 Z"
+                fill="url(#horizonMesh)"
+              />
+
+              {/* Laser Core Horizon Arc */}
+              <path
+                d="M -100 240 Q 500 20 1100 240"
+                fill="none"
+                stroke="url(#horizonLaser)"
+                strokeWidth="2.5"
+              />
+
+              {/* Wireframe Perspective Radial Lines */}
+              <line x1="500" y1="20" x2="100" y2="240" stroke="rgba(244,63,94,0.18)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="500" y1="20" x2="300" y2="240" stroke="rgba(244,63,94,0.18)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="500" y1="20" x2="500" y2="240" stroke="rgba(244,63,94,0.22)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="500" y1="20" x2="700" y2="240" stroke="rgba(244,63,94,0.18)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="500" y1="20" x2="900" y2="240" stroke="rgba(244,63,94,0.18)" strokeWidth="1" strokeDasharray="3 3" />
+            </svg>
+          </div>
+
+          {/* Banner Content */}
+          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Build Safer AI Today
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg mx-auto">
-              Join developers and organizations securing their LLM applications with PromptShield.
+            <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed max-w-lg mx-auto">
+              Join developers and organizations securing their LLM applications with PromptShield in real time.
             </p>
 
-            <div className="pt-3 flex justify-center">
+            {/* Glowing CTA Button */}
+            <div className="pt-2 flex justify-center">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-sm font-semibold transition-all shadow-md shadow-rose-900/30 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-[#e11d48] via-[#f43f5e] to-[#e11d48] hover:opacity-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-[0_4px_25px_rgba(244,63,94,0.55)] active:scale-95 cursor-pointer min-h-[44px]"
               >
-                <span>Get Started</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Get Started Free</span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
             </div>
           </div>

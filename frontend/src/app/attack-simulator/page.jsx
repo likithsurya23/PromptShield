@@ -110,9 +110,6 @@ export default function AttackSimulatorPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               Adversarial Attack Simulator
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Benchmark PromptShield ML & Rule engines against multi-vector adversarial attack suites and custom zero-day payloads.
-            </p>
           </div>
         </div>
 

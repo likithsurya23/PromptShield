@@ -25,8 +25,8 @@ export function AttackCategories({ categories = [], onViewAll }) {
           const widthPercent = (cat.count / maxCount) * 100;
 
           return (
-            <div key={cat.name} className="flex items-center justify-between gap-3 text-xs">
-              <span className="text-slate-300 w-44 truncate text-[11px] font-medium">
+            <div key={cat.name} className="flex items-center justify-between gap-2 sm:gap-3 text-xs">
+              <span className="text-slate-300 w-28 sm:w-36 md:w-44 truncate shrink-0 text-[11px] font-medium">
                 {cat.name}
               </span>
 

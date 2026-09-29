@@ -11,7 +11,7 @@ export function RecentReportsTable({
   onDeleteReport,
 }) {
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">
+    <Card className="p-3.5 sm:p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">
       <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -26,8 +26,8 @@ export function RecentReportsTable({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="overflow-x-auto -mx-1 sm:mx-0">
+          <table className="w-full min-w-[650px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-[11px] text-slate-400 font-medium">
                 <th className="pb-2.5 w-6 text-slate-500">#</th>

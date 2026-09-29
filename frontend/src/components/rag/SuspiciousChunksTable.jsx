@@ -40,8 +40,8 @@ export function SuspiciousChunksTable({
           Ingestion chunks containing prompt injections, role switching, obfuscated commands, or suspicious links.
         </p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto -mx-1 sm:mx-0">
+          <table className="w-full min-w-[520px] text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-[11px] text-slate-400 font-medium">
                 <th className="pb-2.5 font-medium w-8">#</th>

@@ -25,14 +25,9 @@ export function AnalyticsHeader({
           <BarChart3 className="w-5 h-5" />
         </div>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white tracking-tight leading-tight">
-              Threat Analytics & Intelligence
-            </h1>
-          </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real-time telemetry, model benchmark indicators, and attack vector trends from live audit evaluations.
-          </p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Threat Analytics & Intelligence
+          </h1>
         </div>
       </div>
 
@@ -72,11 +67,10 @@ export function AnalyticsHeader({
                     if (onRangeChange) onRangeChange(range);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-3.5 py-2 transition-colors cursor-pointer ${
-                    range === selectedRange
-                      ? 'bg-blue-600/20 text-blue-400 font-semibold'
-                      : 'text-slate-300 hover:bg-slate-800/60'
-                  }`}
+                  className={`w-full text-left px-3.5 py-2 transition-colors cursor-pointer ${range === selectedRange
+                    ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                    : 'text-slate-300 hover:bg-slate-800/60'
+                    }`}
                 >
                   {range}
                 </button>

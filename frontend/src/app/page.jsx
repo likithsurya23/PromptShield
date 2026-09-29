@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { SecurityPipelineSection } from '@/components/landing/SecurityPipelineSection';
@@ -9,12 +9,17 @@ import { LandingFooter } from '@/components/landing/LandingFooter';
 import { CyberBackgroundAnimation } from '@/components/landing/CyberBackgroundAnimation';
 
 export default function LandingHomePage() {
+  // Always enforce dark theme on the landing page
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
   return (
-    <div className="landing-page-root relative min-h-screen bg-slate-50 dark:bg-[#0b080e] text-slate-900 dark:text-slate-100 font-sans selection:bg-rose-600 selection:text-white flex flex-col transition-colors duration-200">
+    <div className="landing-page-root dark relative min-h-screen bg-[#060207] text-slate-100 font-sans selection:bg-rose-600 selection:text-white flex flex-col">
       {/* Background Cyber Animation with prefers-reduced-motion accessibility */}
       <CyberBackgroundAnimation />
 
-      {/* 1. Header Navbar */}
+      {/* 1. Header Navbar (No theme toggle, fixed dark theme) */}
       <LandingNavbar />
 
       <main className="flex-1">

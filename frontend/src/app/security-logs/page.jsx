@@ -168,28 +168,25 @@ export default function SecurityLogsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Security Logs</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Complete audit trail of all prompt scans, threat detections, and model enforcement actions.
-          </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer"
+            className="w-full min-h-[38px] flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-[11px] sm:text-xs font-semibold text-slate-200 transition-colors shadow-sm cursor-pointer text-center"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#f57b83] ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-[#f57b83] shrink-0 ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="truncate">{refreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
 
           <button
             onClick={handleExport}
             disabled={logs.length === 0}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-xs font-semibold text-slate-200 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full min-h-[38px] flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-[11px] sm:text-xs font-semibold text-slate-200 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-center"
           >
-            <Download className="w-3.5 h-3.5 text-slate-400" />
-            <span>Export Logs (JSON)</span>
+            <Download className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="truncate">Export (JSON)</span>
           </button>
         </div>
       </div>

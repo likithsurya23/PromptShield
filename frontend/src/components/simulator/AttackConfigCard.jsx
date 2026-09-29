@@ -517,25 +517,25 @@ export function AttackConfigCard({
       </div>
 
       {/* Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/80 mt-4">
+      <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/80 mt-4 w-full">
         <button
           type="button"
           onClick={onRun}
           disabled={loading || (isCustomMode && customVectorCount === 0)}
-          className={`sm:col-span-8 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white text-xs font-semibold shadow-lg transition-all disabled:opacity-50 cursor-pointer ${
+          className={`sm:col-span-8 w-full min-h-[44px] flex items-center justify-center gap-1.5 py-3 px-2 sm:px-4 rounded-xl text-white text-[11px] sm:text-xs font-semibold shadow-lg transition-all disabled:opacity-50 cursor-pointer ${
             isCustomMode
               ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-950/40'
               : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/40'
           }`}
         >
           {loading ? (
-            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
           ) : (
             <>
-              <Play className="w-3.5 h-3.5 fill-white" />
-              <span>
+              <Play className="w-3.5 h-3.5 fill-white shrink-0" />
+              <span className="truncate">
                 {isCustomMode
-                  ? `Simulate Custom Vectors (${customVectorCount})`
+                  ? `Simulate (${customVectorCount})`
                   : 'Run Simulation'}
               </span>
             </>
@@ -546,10 +546,10 @@ export function AttackConfigCard({
           type="button"
           onClick={onReset}
           disabled={loading}
-          className="sm:col-span-4 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition-colors"
+          className="sm:col-span-4 w-full min-h-[44px] flex items-center justify-center gap-1.5 py-3 px-2 sm:px-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-[11px] sm:text-xs font-semibold transition-colors"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset</span>
+          <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">Reset</span>
         </button>
       </div>
     </Card>

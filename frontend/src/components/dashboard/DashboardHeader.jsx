@@ -16,9 +16,6 @@ export function DashboardHeader({ timeRange, onTimeRangeChange, onRefresh, loadi
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Security Dashboard</h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Real-time telemetry and threat intelligence across all PromptShield scanning pipelines.
-        </p>
       </div>
 
       <div className="flex items-center gap-2.5">

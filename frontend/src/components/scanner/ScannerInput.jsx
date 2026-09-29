@@ -34,7 +34,7 @@ export function ScannerInput({
   };
 
   return (
-    <Card className="flex flex-col justify-between p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
+    <Card className="flex flex-col justify-between p-4 sm:p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
       <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -49,11 +49,11 @@ export function ScannerInput({
           </div>
 
           {/* Action Buttons: Clear & Paste */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onClear}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-rose-400 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-rose-400 transition-colors min-h-[36px] px-2"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Clear</span>
@@ -61,7 +61,7 @@ export function ScannerInput({
             <button
               type="button"
               onClick={handlePaste}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#f57b83] transition-colors"
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#f57b83] transition-colors min-h-[36px] px-2"
             >
               <Clipboard className="w-3.5 h-3.5" />
               <span>Paste</span>
@@ -89,7 +89,7 @@ export function ScannerInput({
           type="button"
           onClick={onScan}
           disabled={loading || !prompt.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all disabled:opacity-50 cursor-pointer"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -106,13 +106,13 @@ export function ScannerInput({
       {/* Try an Example */}
       <div className="mt-6 pt-4 border-t border-[#2c1622]">
         <span className="text-xs text-slate-400 block mb-2.5">Try an example:</span>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {examples.map((ex, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setPrompt(ex)}
-              className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-[#140c17] border border-[#2c1622] hover:border-rose-500/50 hover:bg-[#6a1a24]/20 text-slate-300 hover:text-[#fecdd3] transition-all cursor-pointer"
+              className="min-h-[34px] text-[11px] font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#140c17] border border-[#2c1622] hover:border-rose-500/50 hover:bg-[#6a1a24]/20 text-slate-300 hover:text-[#fecdd3] transition-all cursor-pointer"
             >
               {ex}
             </button>

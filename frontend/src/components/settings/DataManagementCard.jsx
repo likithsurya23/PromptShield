@@ -117,11 +117,11 @@ export function DataManagementCard({
             <p className="text-xs text-slate-400 mb-4 leading-relaxed">
               This will permanently delete all recorded scan logs from memory and database storage. This action cannot be undone.
             </p>
-            <div className="flex items-center justify-end gap-2">
+            <div className="grid grid-cols-2 gap-2 pt-2 w-full">
               <button
                 type="button"
                 onClick={() => setShowClearConfirm(false)}
-                className="px-3.5 py-1.5 rounded-xl bg-[#080d19] border border-slate-800 text-xs text-slate-300 hover:text-white"
+                className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-3.5 py-2 rounded-xl bg-[#080d19] border border-slate-800 text-[11px] sm:text-xs text-slate-300 hover:text-white transition-colors text-center"
               >
                 Cancel
               </button>
@@ -131,9 +131,9 @@ export function DataManagementCard({
                   setShowClearConfirm(false);
                   onClearData();
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white transition-colors"
+                className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-[11px] sm:text-xs font-semibold text-white transition-colors text-center"
               >
-                Yes, Purge All Logs
+                <span className="truncate">Purge All Logs</span>
               </button>
             </div>
           </div>
@@ -151,11 +151,11 @@ export function DataManagementCard({
             <p className="text-xs text-slate-400 mb-4 leading-relaxed">
               This will restore profile, risk thresholds, appearance theme, notification preferences, and API configuration to original default values.
             </p>
-            <div className="flex items-center justify-end gap-2">
+            <div className="grid grid-cols-2 gap-2 pt-2 w-full">
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
-                className="px-3.5 py-1.5 rounded-xl bg-[#080d19] border border-slate-800 text-xs text-slate-300 hover:text-white"
+                className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-3.5 py-2 rounded-xl bg-[#080d19] border border-slate-800 text-[11px] sm:text-xs text-slate-300 hover:text-white transition-colors text-center"
               >
                 Cancel
               </button>
@@ -165,9 +165,9 @@ export function DataManagementCard({
                   setShowResetConfirm(false);
                   onResetAllSettings();
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white transition-colors"
+                className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-[11px] sm:text-xs font-semibold text-white transition-colors text-center"
               >
-                Reset Everything
+                <span className="truncate">Reset All</span>
               </button>
             </div>
           </div>
@@ -191,12 +191,12 @@ export function DataManagementCard({
               <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
               <span>You will be immediately logged out and returned to the sign-in page.</span>
             </div>
-            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-2">
+            <div className="grid grid-cols-2 gap-2 pt-2 w-full">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 text-xs font-medium text-slate-300 hover:text-white hover:border-slate-700 transition-colors cursor-pointer"
+                className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 text-[11px] sm:text-xs font-medium text-slate-300 hover:text-white hover:border-slate-700 transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
@@ -209,14 +209,14 @@ export function DataManagementCard({
                   }
                 }}
                 disabled={isDeleting}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-rose-950/60 transition-all active:scale-95 cursor-pointer"
+                className="w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:opacity-95 text-white text-[11px] sm:text-xs font-bold shadow-lg shadow-rose-950/60 transition-all active:scale-95 cursor-pointer text-center"
               >
                 {isDeleting ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
                 ) : (
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
                 )}
-                <span>Yes, Permanently Delete Account</span>
+                <span className="truncate">{isDeleting ? 'Deleting...' : 'Delete'}</span>
               </button>
             </div>
           </div>

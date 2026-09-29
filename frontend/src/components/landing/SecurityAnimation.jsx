@@ -6,47 +6,18 @@ export function SecurityAnimation() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Theme tracking for canvas contrast
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const checkDark = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-    checkDark();
-
-    const observer = new MutationObserver(checkDark);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    const handleAppearanceUpdate = (e) => {
-      if (e.detail?.theme) {
-        setIsDark(e.detail.theme.toLowerCase() !== 'light');
-      }
-    };
-    window.addEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('promptshield:appearance_updated', handleAppearanceUpdate);
-    };
-  }, []);
-
-  // 3D Parallax Tilt state
+  // Parallax tilt state
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
-  // Mouse move parallax handler
   const handleMouseMove = useCallback((e) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
 
-    const rotateX = -(y / (rect.height / 2)) * 12;
-    const rotateY = (x / (rect.width / 2)) * 12;
+    const rotateX = -(y / (rect.height / 2)) * 8;
+    const rotateY = (x / (rect.width / 2)) * 8;
 
     setTilt({ rotateX, rotateY });
   }, []);
@@ -60,7 +31,7 @@ export function SecurityAnimation() {
     setIsHovered(true);
   }, []);
 
-  // Canvas Hexagonal Forcefield & Threat Deflection Engine
+  // Ambient Cyber Particle & Spark Engine
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -68,286 +39,57 @@ export function SecurityAnimation() {
     if (!ctx) return;
 
     let animId = null;
-    let width = (canvas.width = 560);
-    let height = (canvas.height = 460);
-
-    const reduceMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let width = (canvas.width = 540);
+    let height = (canvas.height = 540);
 
     const handleResize = () => {
       if (canvas.parentElement) {
-        width = canvas.width = canvas.parentElement.clientWidth || 560;
-        height = canvas.height = canvas.parentElement.clientHeight || 460;
+        width = canvas.width = canvas.parentElement.clientWidth || 540;
+        height = canvas.height = canvas.parentElement.clientHeight || 540;
       }
     };
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const forcefieldRadius = Math.min(width, height) * 0.32;
+    const particles = [];
+    const particleCount = 35;
 
-    // Generate Hexagonal Forcefield Grid Coordinates
-    const hexagons = [];
-    const hexRadius = 18;
-    const hexHeight = hexRadius * Math.sqrt(3);
-
-    for (let r = -forcefieldRadius - 20; r <= forcefieldRadius + 20; r += hexHeight * 0.85) {
-      for (let q = -forcefieldRadius - 20; q <= forcefieldRadius + 20; q += hexRadius * 1.5) {
-        const x = centerX + q;
-        const y = centerY + r + (Math.abs(Math.round(q / (hexRadius * 1.5))) % 2 === 1 ? hexHeight / 2 : 0);
-        const dist = Math.hypot(x - centerX, y - centerY);
-
-        // Only keep hexagons forming the defensive perimeter barrier
-        if (dist >= forcefieldRadius * 0.55 && dist <= forcefieldRadius + 25) {
-          hexagons.push({
-            x,
-            y,
-            dist,
-            intensity: 0,
-            baseAlpha: Math.max(0.08, 0.22 - (dist / forcefieldRadius) * 0.09),
-          });
-        }
-      }
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -0.3 - Math.random() * 0.6,
+        size: 1 + Math.random() * 2,
+        alpha: 0.2 + Math.random() * 0.6,
+        color: Math.random() > 0.3 ? '#f43f5e' : '#fb7185',
+      });
     }
 
-    // Helper: draw single hexagon
-    const drawHex = (c, x, y, r, strokeStyle, fillStyle, lineWidth = 1) => {
-      c.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i;
-        const hx = x + r * Math.cos(angle);
-        const hy = y + r * Math.sin(angle);
-        if (i === 0) c.moveTo(hx, hy);
-        else c.lineTo(hx, hy);
-      }
-      c.closePath();
-      if (fillStyle) {
-        c.fillStyle = fillStyle;
-        c.fill();
-      }
-      if (strokeStyle) {
-        c.strokeStyle = strokeStyle;
-        c.lineWidth = lineWidth;
-        c.stroke();
-      }
-    };
-
-    // Threat packet simulation
-    const threats = [];
-    const sparks = [];
-    const shockwaves = [];
-    const maxThreats = reduceMotion ? 2 : 6;
-
-    class ThreatPacket {
-      constructor() {
-        this.reset();
-      }
-
-      reset() {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.max(width, height) * 0.62;
-        this.x = centerX + Math.cos(angle) * dist;
-        this.y = centerY + Math.sin(angle) * dist;
-        this.speed = reduceMotion ? 0 : 1.3 + Math.random() * 1.5;
-        this.size = 2.4 + Math.random() * 1.8;
-        this.color = Math.random() > 0.3 ? '#e11d48' : '#f43f5e';
-        this.tail = [];
-        this.tailLength = 12;
-      }
-
-      update() {
-        this.tail.push({ x: this.x, y: this.y });
-        if (this.tail.length > this.tailLength) {
-          this.tail.shift();
-        }
-
-        const dx = centerX - this.x;
-        const dy = centerY - this.y;
-        const dist = Math.hypot(dx, dy);
-
-        // Collision with Hexagonal Forcefield Barrier
-        if (dist <= forcefieldRadius + 8) {
-          // Illuminate nearby forcefield hexagons on impact
-          hexagons.forEach((hex) => {
-            const hDist = Math.hypot(hex.x - this.x, hex.y - this.y);
-            if (hDist < 48) {
-              hex.intensity = Math.max(hex.intensity, 1 - hDist / 48);
-            }
-          });
-
-          // Generate Deflection Sparks
-          for (let i = 0; i < 9; i++) {
-            sparks.push(new Spark(this.x, this.y, this.color));
-          }
-
-          // Expand Forcefield Shockwave
-          shockwaves.push(new Shockwave(this.x, this.y));
-
-          this.reset();
-        } else {
-          this.x += (dx / dist) * this.speed;
-          this.y += (dy / dist) * this.speed;
-        }
-      }
-
-      draw(c) {
-        // Glowing comet tail
-        for (let i = 0; i < this.tail.length; i++) {
-          const pt = this.tail[i];
-          const alpha = (i / this.tail.length) * (isDark ? 0.35 : 0.5);
-          c.beginPath();
-          c.arc(pt.x, pt.y, this.size * 0.6, 0, Math.PI * 2);
-          c.fillStyle = `rgba(225, 29, 72, ${alpha})`;
-          c.fill();
-        }
-
-        // Threat core
-        c.beginPath();
-        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        c.fillStyle = this.color;
-        c.shadowColor = '#e11d48';
-        c.shadowBlur = isDark ? 10 : 8;
-        c.fill();
-        c.shadowBlur = 0;
-      }
-    }
-
-    class Spark {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 1.0 + Math.random() * 3.5;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.alpha = 1;
-        this.decay = 0.035 + Math.random() * 0.03;
-        this.size = 1.4 + Math.random() * 1.8;
-        this.color = color;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= 0.96;
-        this.vy *= 0.96;
-        this.alpha -= this.decay;
-      }
-
-      draw(c) {
-        c.beginPath();
-        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        c.fillStyle = isDark
-          ? `rgba(254, 205, 211, ${Math.max(0, this.alpha)})`
-          : `rgba(225, 29, 72, ${Math.max(0, this.alpha)})`;
-        c.shadowColor = '#e11d48';
-        c.shadowBlur = 8;
-        c.fill();
-        c.shadowBlur = 0;
-      }
-    }
-
-    class Shockwave {
-      constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.radius = 3;
-        this.alpha = 0.85;
-      }
-
-      update() {
-        this.radius += 1.4;
-        this.alpha -= 0.04;
-      }
-
-      draw(c) {
-        if (this.alpha <= 0) return;
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        c.strokeStyle = isDark
-          ? `rgba(251, 113, 133, ${this.alpha})`
-          : `rgba(225, 29, 72, ${this.alpha * 1.2})`;
-        c.lineWidth = 1.4;
-        c.stroke();
-      }
-    }
-
-    for (let i = 0; i < maxThreats; i++) {
-      threats.push(new ThreatPacket());
-    }
-
-    let frame = 0;
     const render = () => {
-      frame++;
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw Hexagonal Forcefield Grid
-      const breathingPulse = Math.sin(frame * 0.02) * 0.04;
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
 
-      for (let hex of hexagons) {
-        // Decay impact intensity
-        if (hex.intensity > 0) {
-          hex.intensity = Math.max(0, hex.intensity - 0.025);
+        if (p.y < 0) {
+          p.y = height + 10;
+          p.x = Math.random() * width;
         }
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
 
-        // Higher visibility multiplier in light theme
-        const alphaMultiplier = isDark ? 1.0 : 1.6;
-        const totalAlpha = Math.min(1, (hex.baseAlpha + breathingPulse + hex.intensity * 0.8) * alphaMultiplier);
-        
-        const strokeColor = isDark
-          ? `rgba(244, 63, 94, ${totalAlpha})`
-          : `rgba(225, 29, 72, ${totalAlpha})`;
-
-        const fillColor = hex.intensity > 0.08
-          ? isDark
-            ? `rgba(244, 63, 94, ${hex.intensity * 0.35})`
-            : `rgba(225, 29, 72, ${hex.intensity * 0.45})`
-          : (!isDark ? `rgba(244, 63, 94, 0.03)` : null);
-
-        drawHex(
-          ctx,
-          hex.x,
-          hex.y,
-          hexRadius - 1.5,
-          strokeColor,
-          fillColor,
-          hex.intensity > 0.2 ? 1.8 : (isDark ? 0.8 : 1.1)
-        );
-      }
-
-      // 2. Draw Subtle Concentric Defense Wave Radiance
-      if (!reduceMotion) {
-        const wave = (frame * 0.01) % 1;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, forcefieldRadius * (0.8 + wave * 0.4), 0, Math.PI * 2);
-        ctx.strokeStyle = isDark
-          ? `rgba(244, 63, 94, ${(1 - wave) * 0.2})`
-          : `rgba(225, 29, 72, ${(1 - wave) * 0.35})`;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-      }
-
-      // 3. Update & render threats
-      for (const t of threats) {
-        t.update();
-        t.draw(ctx);
-      }
-
-      // 4. Update & render sparks
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        sparks[i].update();
-        sparks[i].draw(ctx);
-        if (sparks[i].alpha <= 0) sparks.splice(i, 1);
-      }
-
-      // 5. Update & render shockwaves
-      for (let i = shockwaves.length - 1; i >= 0; i--) {
-        shockwaves[i].update();
-        shockwaves[i].draw(ctx);
-        if (shockwaves[i].alpha <= 0) shockwaves.splice(i, 1);
-      }
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.shadowColor = '#e11d48';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+      });
 
       animId = requestAnimationFrame(render);
     };
@@ -358,7 +100,7 @@ export function SecurityAnimation() {
       if (animId) cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [isDark]);
+  }, []);
 
   return (
     <div
@@ -366,190 +108,307 @@ export function SecurityAnimation() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full max-w-[580px] aspect-[574/450] flex items-center justify-center select-none group cursor-pointer overflow-hidden rounded-2xl"
-      style={{ perspective: '1100px' }}
-      title="Interactive 3D AI Security Shield & Threat Deflection Forcefield"
+      className="relative w-full max-w-[340px] sm:max-w-[480px] lg:max-w-[520px] aspect-square flex items-center justify-center select-none group cursor-pointer overflow-visible mx-auto"
+      style={{ perspective: '1200px' }}
+      title="PromptShield Autonomous Cyber Defense Engine"
     >
-      {/* 1. Deep Atmospheric Cyber Nebula Glow (Adaptive Light & Dark) */}
-      <div className="absolute w-[460px] h-[460px] bg-gradient-to-tr from-rose-300/40 via-pink-300/25 to-rose-200/35 dark:from-[#881337]/40 dark:via-[#e11d48]/20 dark:to-[#4c0519]/35 rounded-full blur-[100px] pointer-events-none transition-opacity duration-700 opacity-85 group-hover:opacity-100" />
-      <div className="absolute w-[280px] h-[280px] bg-rose-400/20 dark:bg-rose-500/15 rounded-full blur-[70px] pointer-events-none animate-pulse" />
+      {/* 1. Deep Atmospheric Ruby Nebula Glow */}
+      <div className="absolute w-[300px] sm:w-[420px] h-[300px] sm:h-[420px] bg-gradient-to-tr from-[#881337]/50 via-[#e11d48]/30 to-[#4c0519]/40 rounded-full blur-[90px] sm:blur-[120px] pointer-events-none transition-opacity duration-700 opacity-90 group-hover:opacity-100" />
+      <div className="absolute w-[180px] sm:w-[260px] h-[180px] sm:h-[260px] bg-rose-500/20 rounded-full blur-[60px] pointer-events-none animate-pulse" />
 
-      {/* 2. 3D Gyroscopic Parallax Tilt Container */}
+      {/* 2. Interactive Parallax 3D Layer */}
       <div
-        className="relative w-full h-full flex items-center justify-center transition-transform duration-200 ease-out"
+        className="relative w-full h-full flex items-center justify-center transition-transform duration-300 ease-out"
         style={{
           transform: `rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) scale3d(${isHovered ? 1.02 : 1}, ${isHovered ? 1.02 : 1}, 1)`,
           transformStyle: 'preserve-3d',
         }}
       >
-        {/* 3. Outer Rotating Orbital Cyber Rings */}
-        <div className="absolute w-[440px] h-[440px] sm:w-[480px] sm:h-[480px] rounded-full border border-rose-400/40 dark:border-rose-500/20 pointer-events-none animate-[spin_40s_linear_infinite]">
-          {/* Orbital Satellite Node 1 */}
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 dark:bg-[#170817]/90 border border-rose-300 dark:border-rose-500/40 text-[9px] font-mono text-rose-600 dark:text-rose-300 shadow-md shadow-rose-950/20 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-            <span>NEURAL GATEWAY</span>
-          </div>
+        {/* Floating Sparks Canvas Background */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        />
 
-          {/* Orbital Satellite Node 2 */}
-          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 dark:bg-[#170817]/90 border border-rose-300 dark:border-rose-500/40 text-[9px] font-mono text-rose-600 dark:text-rose-300 shadow-md shadow-rose-950/20 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-            <span>RAG SENTINEL</span>
+        {/* 3. Base Platform: Multi-tier Stepped Glowing Pedestal */}
+        <div
+          className="absolute bottom-6 sm:bottom-8 w-[240px] sm:w-[340px] h-[90px] sm:h-[120px] pointer-events-none z-10 flex items-center justify-center"
+          style={{ transform: 'rotateX(55deg) translateZ(-40px)' }}
+        >
+          {/* Ground Laser Glow */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-600/30 via-rose-500/50 to-rose-600/30 blur-xl animate-pulse" />
+
+          {/* Tier 1: Bottom Slabs */}
+          <div className="absolute inset-x-2 inset-y-2 rounded-2xl bg-[#14050f]/90 border border-rose-500/40 shadow-[0_0_25px_rgba(244,63,94,0.35)]" />
+          
+          {/* Tier 2: Elevated Middle Slab */}
+          <div
+            className="absolute inset-x-6 inset-y-5 rounded-xl bg-gradient-to-b from-[#25081c] to-[#0f030b] border border-rose-500/60 shadow-[0_0_20px_rgba(244,63,94,0.5)]"
+            style={{ transform: 'translateZ(14px)' }}
+          />
+
+          {/* Tier 3: Top Plinth with Concentric Laser Radar Circles */}
+          <div
+            className="absolute inset-x-10 inset-y-8 rounded-lg bg-gradient-to-b from-[#330b26] to-[#12030e] border border-rose-400/80 flex items-center justify-center overflow-hidden"
+            style={{ transform: 'translateZ(26px)' }}
+          >
+            {/* Concentric Radar Rings on Platform Surface */}
+            <div className="w-20 h-20 rounded-full border border-rose-500/40 absolute animate-ping opacity-30" />
+            <div className="w-14 h-14 rounded-full border border-rose-400/50 absolute" />
+            <div className="w-8 h-8 rounded-full border border-rose-300/70 absolute bg-rose-500/20" />
+            {/* Crosshair Laser Axes */}
+            <div className="w-full h-[1px] bg-rose-500/40 absolute" />
+            <div className="h-full w-[1px] bg-rose-500/40 absolute" />
           </div>
         </div>
 
-        {/* Counter-rotating Inner Dashed Defense Ring */}
-        <div className="absolute w-[350px] h-[350px] sm:w-[390px] sm:h-[390px] rounded-full border border-dashed border-rose-400/40 dark:border-rose-500/25 pointer-events-none animate-[spin_55s_linear_infinite_reverse]" />
-
-        {/* 4. Canvas: Hexagonal Forcefield & Particle Deflection */}
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
-        />
-
-        {/* 5. Centerpiece: Multi-Layer Holographic 3D Vector Cyber Shield */}
+        {/* 4. Upper & Lower Holographic 3D Orbital Swirl Rings */}
+        {/* Ring 1: Primary Upper Ring */}
         <div
-          className="relative w-[280px] sm:w-[330px] h-[320px] sm:h-[380px] flex items-center justify-center z-20 animate-[floatShield_6s_ease-in-out_infinite]"
-          style={{ transform: 'translateZ(25px)' }}
+          className="absolute w-[290px] sm:w-[410px] h-[110px] sm:h-[150px] rounded-[50%] border-2 border-rose-500/70 shadow-[0_0_25px_rgba(244,63,94,0.6)] pointer-events-none z-15 animate-[spinRing_16s_linear_infinite]"
+          style={{
+            transform: 'rotateX(72deg) rotateY(-22deg) rotateZ(15deg) translateY(-25px)',
+            boxShadow: 'inset 0 0 15px rgba(244,63,94,0.4), 0 0 25px rgba(244,63,94,0.6)',
+          }}
         >
-          {/* Pure Vector Cyber Shield SVG */}
+          {/* Orbital Light Streak Node */}
+          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_12px_#ffffff,0_0_24px_#f43f5e]" />
+        </div>
+
+        {/* Ring 2: Lower Wide Defense Ring */}
+        <div
+          className="absolute w-[320px] sm:w-[450px] h-[120px] sm:h-[170px] rounded-[50%] border border-rose-400/50 shadow-[0_0_20px_rgba(225,29,72,0.4)] pointer-events-none z-25 animate-[spinRingRev_22s_linear_infinite]"
+          style={{
+            transform: 'rotateX(68deg) rotateY(-18deg) rotateZ(-20deg) translateY(35px)',
+            boxShadow: 'inset 0 0 10px rgba(244,63,94,0.3), 0 0 20px rgba(244,63,94,0.4)',
+          }}
+        >
+          <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#fca5a5] shadow-[0_0_10px_#fda4af,0_0_20px_#f43f5e]" />
+        </div>
+
+        {/* 5. Floating 3D Holographic Data Cubes */}
+        {/* Cube 1: Left */}
+        <div
+          className="absolute left-3 sm:left-6 top-28 sm:top-36 w-7 sm:w-10 h-7 sm:h-10 pointer-events-none z-20 animate-[floatCube1_6s_ease-in-out_infinite]"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="w-full h-full rounded-md bg-rose-500/15 border border-rose-400/80 shadow-[0_0_12px_rgba(244,63,94,0.5)] backdrop-blur-xs transform rotate-12 rotate-y-24" />
+        </div>
+
+        {/* Cube 2: Right */}
+        <div
+          className="absolute right-2 sm:right-6 top-36 sm:top-48 w-8 sm:w-11 h-8 sm:h-11 pointer-events-none z-20 animate-[floatCube2_7s_ease-in-out_infinite_1s]"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="w-full h-full rounded-md bg-rose-500/20 border border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.6)] backdrop-blur-xs transform -rotate-12 rotate-y-30" />
+        </div>
+
+        {/* Cube 3: Micro Top Cube */}
+        <div
+          className="absolute right-12 sm:right-20 top-12 sm:top-16 w-4 sm:w-6 h-4 sm:h-6 pointer-events-none z-10 animate-[floatCube1_5s_ease-in-out_infinite_2s]"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="w-full h-full rounded-sm bg-rose-500/20 border border-rose-300/80 shadow-[0_0_8px_rgba(244,63,94,0.4)]" />
+        </div>
+
+        {/* 6. Centerpiece: The Animated Ruby & Obsidian Beveled Security Shield */}
+        <div
+          className="relative w-[190px] sm:w-[270px] lg:w-[290px] h-[230px] sm:h-[330px] lg:h-[350px] flex items-center justify-center z-20 animate-[floatShield_5s_ease-in-out_infinite]"
+          style={{
+            transform: 'translateZ(30px) translateY(-20px)',
+            filter: 'drop-shadow(0 20px 45px rgba(225, 29, 72, 0.55))',
+          }}
+        >
           <svg
             viewBox="0 0 320 380"
-            className="w-full h-full filter drop-shadow-[0_20px_50px_rgba(225,29,72,0.4)] group-hover:drop-shadow-[0_25px_65px_rgba(225,29,72,0.6)] transition-all duration-500 select-none pointer-events-none"
+            className="w-full h-full select-none pointer-events-none"
           >
             <defs>
-              {/* Outer Shield Gradient */}
-              <linearGradient id="shieldChassisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f43f5e" />
-                <stop offset="35%" stopColor="#be123c" />
-                <stop offset="70%" stopColor="#881337" />
+              {/* Outer Beveled Chassis Ruby Gradient */}
+              <linearGradient id="shieldChassis" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff4d6d" />
+                <stop offset="25%" stopColor="#e11d48" />
+                <stop offset="65%" stopColor="#9f1239" />
                 <stop offset="100%" stopColor="#4c0519" />
               </linearGradient>
 
-              {/* Inner Plate Metallic Inset Gradient */}
-              <linearGradient id="innerPlateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#240c1b" />
-                <stop offset="50%" stopColor="#180715" />
-                <stop offset="100%" stopColor="#0d020b" />
+              {/* Inner Glossy Obsidian Face Gradient */}
+              <linearGradient id="innerObsidian" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#1f0717" />
+                <stop offset="40%" stopColor="#13030e" />
+                <stop offset="100%" stopColor="#080106" />
               </linearGradient>
 
-              {/* Glowing Rim Gradient */}
-              <linearGradient id="glowingRimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#fda4af" />
-                <stop offset="50%" stopColor="#f43f5e" />
-                <stop offset="100%" stopColor="#e11d48" />
-              </linearGradient>
-
-              {/* Laser Core Shimmer */}
-              <linearGradient id="coreGlowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-                <stop offset="40%" stopColor="#f43f5e" stopOpacity="0.8" />
+              {/* Laser Core Gradient */}
+              <radialGradient id="laserCore" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                <stop offset="25%" stopColor="#ff4d6d" stopOpacity="0.9" />
+                <stop offset="60%" stopColor="#e11d48" stopOpacity="0.4" />
                 <stop offset="100%" stopColor="#881337" stopOpacity="0" />
+              </radialGradient>
+
+              {/* Specular Rim Light */}
+              <linearGradient id="rimGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffccd5" />
+                <stop offset="50%" stopColor="#ff3366" />
+                <stop offset="100%" stopColor="#be123c" />
               </linearGradient>
             </defs>
 
-            {/* Layer 1: Outer Holographic Aura Blur */}
+            {/* Layer 1: Ambient Red Edge Halo */}
             <path
-              d="M 160 20 L 280 65 L 260 220 C 240 290 190 335 160 360 C 130 335 80 290 60 220 L 40 65 Z"
+              d="M 160 22 C 190 38, 245 42, 285 58 C 285 145, 275 240, 160 365 C 45 240, 35 145, 35 58 C 75 42, 130 38, 160 22 Z"
               fill="none"
-              stroke="rgba(244,63,94,0.4)"
-              strokeWidth="10"
-              filter="blur(6px)"
+              stroke="#ff2a55"
+              strokeWidth="12"
+              opacity="0.35"
+              filter="blur(8px)"
             />
 
-            {/* Layer 2: Main Shield Chassis Outer Armor */}
+            {/* Layer 2: Outer Beveled Armor Rim */}
             <path
-              d="M 160 24 L 275 68 L 256 218 C 236 285 188 328 160 352 C 132 328 84 285 64 218 L 45 68 Z"
-              fill="url(#shieldChassisGrad)"
-              stroke="url(#glowingRimGrad)"
+              d="M 160 24 C 188 38, 242 42, 280 58 C 280 142, 270 236, 160 360 C 50 236, 40 142, 40 58 C 78 42, 132 38, 160 24 Z"
+              fill="url(#shieldChassis)"
+              stroke="url(#rimGlow)"
               strokeWidth="2.5"
             />
 
-            {/* Layer 3: Inset Honeycomb Tech Bed */}
+            {/* Layer 3: Inner Glass Face Inset */}
             <path
-              d="M 160 42 L 255 78 L 238 206 C 220 265 178 304 160 326 C 142 304 100 265 82 206 L 65 78 Z"
-              fill="url(#innerPlateGrad)"
-              stroke="rgba(244,63,94,0.4)"
+              d="M 160 40 C 184 52, 230 56, 262 70 C 262 138, 252 220, 160 332 C 68 220, 58 138, 58 70 C 90 56, 136 52, 160 40 Z"
+              fill="url(#innerObsidian)"
+              stroke="rgba(244, 63, 94, 0.45)"
               strokeWidth="1.5"
             />
 
-            {/* Layer 4: Geometric Facets */}
-            {/* Left Flange */}
-            <polygon
-              points="160,45 80,82 95,200 160,280 160,45"
-              fill="rgba(244,63,94,0.12)"
-              stroke="rgba(244,63,94,0.35)"
-              strokeWidth="1"
-            />
-            {/* Right Flange */}
-            <polygon
-              points="160,45 240,82 225,200 160,280 160,45"
-              fill="rgba(244,63,94,0.18)"
-              stroke="rgba(244,63,94,0.45)"
-              strokeWidth="1"
+            {/* Layer 4: Specular Reflection Facets */}
+            {/* Top-Left Gloss Highlight */}
+            <path
+              d="M 160 40 C 184 52, 230 56, 262 70 C 262 120, 255 170, 230 210 L 160 160 Z"
+              fill="rgba(255, 255, 255, 0.05)"
             />
 
-            {/* Layer 5: Centerpiece AI Crest & Crosshairs */}
-            <g transform="translate(160, 160)">
-              {/* Central Glowing Shield Crest */}
-              <circle r="36" fill="rgba(244,63,94,0.2)" stroke="rgba(244,63,94,0.7)" strokeWidth="1.5" />
-              <circle r="26" fill="rgba(20,5,18,0.9)" stroke="#f43f5e" strokeWidth="2" />
-              
-              {/* Radar Crosshair ticks */}
-              <line x1="-36" y1="0" x2="-26" y2="0" stroke="#fda4af" strokeWidth="1.5" />
-              <line x1="26" y1="0" x2="36" y2="0" stroke="#fda4af" strokeWidth="1.5" />
-              <line x1="0" y1="-36" x2="0" y2="-26" stroke="#fda4af" strokeWidth="1.5" />
-              <line x1="0" y1="26" x2="0" y2="36" stroke="#fda4af" strokeWidth="1.5" />
-
-              {/* Pulsing Center AI Neural Spark */}
-              <circle r="9" fill="#fda4af" className="animate-pulse" />
-              <circle r="4" fill="#ffffff" />
-            </g>
-
-            {/* Layer 6: Vertical Laser Scanning Beam Overlay */}
-            <g className="overflow-hidden">
-              <line
-                x1="70"
-                y1="0"
-                x2="250"
-                y2="0"
-                stroke="url(#coreGlowGrad)"
-                strokeWidth="4"
-                className="animate-[shieldLaserScan_4s_cubic-bezier(0.65,0,0.35,1)_infinite]"
+            {/* Layer 5: Concentric AI Radar Target Reticle */}
+            <g transform="translate(160, 185)">
+              {/* Radar Outer Reticle Ring */}
+              <circle
+                r="56"
+                fill="none"
+                stroke="rgba(244, 63, 94, 0.35)"
+                strokeWidth="1.2"
+                strokeDasharray="4 3"
               />
+
+              {/* Radar Middle Ring */}
+              <circle
+                r="40"
+                fill="none"
+                stroke="rgba(255, 51, 102, 0.6)"
+                strokeWidth="1.6"
+              />
+
+              {/* Radar Inner Ring */}
+              <circle
+                r="26"
+                fill="none"
+                stroke="#ff2a55"
+                strokeWidth="2"
+                className="animate-pulse"
+              />
+
+              {/* Radar Crosshairs */}
+              <line x1="-58" y1="0" x2="-40" y2="0" stroke="#ff859c" strokeWidth="1.8" />
+              <line x1="40" y1="0" x2="58" y2="0" stroke="#ff859c" strokeWidth="1.8" />
+              <line x1="0" y1="-58" x2="0" y2="-40" stroke="#ff859c" strokeWidth="1.8" />
+              <line x1="0" y1="40" x2="0" y2="58" stroke="#ff859c" strokeWidth="1.8" />
+
+              {/* Central Glowing Bullseye Sphere */}
+              <circle r="15" fill="url(#laserCore)" />
+              <circle r="9" fill="#ff2a55" className="animate-ping" opacity="0.75" />
+              <circle r="7" fill="#ff4d6d" />
+              <circle r="3.5" fill="#ffffff" />
             </g>
+
+            {/* Layer 6: Vertical Scanning Laser Sweep Line */}
+            <line
+              x1="70"
+              y1="0"
+              x2="250"
+              y2="0"
+              stroke="#ffffff"
+              strokeWidth="2.5"
+              filter="drop-shadow(0 0 6px #ff2a55)"
+              className="animate-[shieldScan_3.5s_cubic-bezier(0.4,0,0.2,1)_infinite]"
+            />
           </svg>
         </div>
       </div>
 
-      {/* Global CSS for Shield Float & Laser Scan */}
+      {/* Global CSS for Animations */}
       <style jsx global>{`
         @keyframes floatShield {
           0%, 100% {
-            transform: translateY(0px);
+            transform: translateZ(30px) translateY(-20px);
           }
           50% {
-            transform: translateY(-10px);
+            transform: translateZ(30px) translateY(-32px);
           }
         }
-        @keyframes shieldLaserScan {
+        @keyframes spinRing {
           0% {
-            transform: translateY(40px);
+            transform: rotateX(72deg) rotateY(-22deg) rotateZ(0deg) translateY(-25px);
+          }
+          100% {
+            transform: rotateX(72deg) rotateY(-22deg) rotateZ(360deg) translateY(-25px);
+          }
+        }
+        @keyframes spinRingRev {
+          0% {
+            transform: rotateX(68deg) rotateY(-18deg) rotateZ(360deg) translateY(35px);
+          }
+          100% {
+            transform: rotateX(68deg) rotateY(-18deg) rotateZ(0deg) translateY(35px);
+          }
+        }
+        @keyframes floatCube1 {
+          0%, 100% {
+            transform: translateY(0px) rotate(12deg);
+          }
+          50% {
+            transform: translateY(-14px) rotate(22deg);
+          }
+        }
+        @keyframes floatCube2 {
+          0%, 100% {
+            transform: translateY(0px) rotate(-12deg);
+          }
+          50% {
+            transform: translateY(-16px) rotate(-24deg);
+          }
+        }
+        @keyframes shieldScan {
+          0% {
+            transform: translateY(60px);
             opacity: 0;
           }
           15% {
-            opacity: 0.95;
+            opacity: 0.9;
           }
           85% {
-            opacity: 0.95;
+            opacity: 0.9;
           }
           100% {
-            transform: translateY(320px);
+            transform: translateY(330px);
             opacity: 0;
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .animate-\\[floatShield_6s_ease-in-out_infinite\\],
-          .animate-\\[shieldLaserScan_4s_cubic-bezier\\(0\\.65\\,0\\.35\\,1\\)_infinite\\] {
+          .animate-\\[floatShield_5s_ease-in-out_infinite\\],
+          .animate-\\[spinRing_16s_linear_infinite\\],
+          .animate-\\[spinRingRev_22s_linear_infinite\\],
+          .animate-\\[floatCube1_6s_ease-in-out_infinite\\],
+          .animate-\\[floatCube2_7s_ease-in-out_infinite_1s\\],
+          .animate-\\[shieldScan_3\\.5s_cubic-bezier\\(0\\.4\\,0\\,0\\.2\\,1\\)_infinite\\] {
             animation: none !important;
           }
         }

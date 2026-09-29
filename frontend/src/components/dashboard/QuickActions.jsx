@@ -75,11 +75,11 @@ export function QuickActions({ actions = [] }) {
 
       {activeModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs"
           onClick={() => setActiveModal(null)}
         >
           <div
-            className="w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl p-6 shadow-2xl space-y-4"
+            className="w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -88,7 +88,8 @@ export function QuickActions({ actions = [] }) {
               </span>
               <button
                 onClick={() => setActiveModal(null)}
-                className="text-slate-400 hover:text-white"
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors"
+                aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -101,7 +102,7 @@ export function QuickActions({ actions = [] }) {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+                className="min-h-[38px] px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
               >
                 Launch
               </button>

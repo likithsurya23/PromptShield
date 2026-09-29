@@ -6,47 +6,22 @@ import { Shield } from 'lucide-react';
 
 export function LandingFooter() {
   return (
-    <footer className="border-t border-slate-200 dark:border-rose-950/40 bg-white/95 dark:bg-[#0b080e] py-10 text-slate-500 dark:text-slate-400 text-xs transition-colors">
+    <footer className="border-t border-rose-950/40 bg-[#0b080e] py-8 sm:py-10 text-slate-400 text-xs">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          
-          {/* Left: Brand Logo & Tagline */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-[#1a0e1c] border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-[#f57b83] flex items-center justify-center shadow-sm dark:shadow-inner">
-              <Shield className="w-4 h-4 fill-rose-500/20 stroke-rose-600 dark:stroke-[#f57b83]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
-                Prompt<span className="text-rose-600 dark:text-[#f57b83]">Shield</span>
-              </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                Secure AI. Safer Tomorrow.
-              </span>
-            </div>
-          </Link>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 text-center md:text-left">
 
           {/* Right: Nav Links, Socials & Copyright */}
-          <div className="flex flex-col items-center md:items-end gap-2.5">
+          <div className="flex flex-col items-center md:items-end gap-3">
             {/* Links & Socials Row */}
-            <div className="flex flex-wrap items-center gap-6 text-xs text-slate-600 dark:text-slate-300">
-              <a href="#docs" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                Docs
-              </a>
-              <a href="#privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                Privacy
-              </a>
-              <a href="#contact" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                Contact
-              </a>
-
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 sm:gap-6 text-xs text-slate-300">
               {/* Social icons */}
-              <div className="flex items-center gap-3.5 pl-1 text-slate-400">
+              <div className="flex items-center gap-1.5 pl-1 text-slate-400">
                 {/* GitHub */}
                 <a
-                  href="https://github.com"
+                  href="https://github.com/likithsurya23"
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg hover:text-white hover:bg-rose-950/40 transition-colors"
                   aria-label="GitHub"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -59,7 +34,7 @@ export function LandingFooter() {
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-rose-950/40 transition-colors"
                   aria-label="LinkedIn"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -72,7 +47,7 @@ export function LandingFooter() {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-rose-950/40 transition-colors"
                   aria-label="X / Twitter"
                 >
                   <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">

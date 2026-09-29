@@ -67,7 +67,7 @@ export function LogsTable({
   };
 
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">
+    <Card className="p-3.5 sm:p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl h-full flex flex-col justify-between">
       <div>
         {/* Table Header Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -77,7 +77,7 @@ export function LogsTable({
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 sm:gap-3 text-xs text-slate-400">
             <div className="flex items-center gap-1.5">
               <span>Show</span>
               <select className="bg-[#080d19] border border-slate-800 rounded-lg py-1 px-2 text-xs text-white">
@@ -93,13 +93,15 @@ export function LogsTable({
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                className="p-1 hover:text-white rounded bg-slate-900 border border-slate-800 transition-colors"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center p-1 hover:text-white rounded bg-slate-900 border border-slate-800 transition-colors"
+                aria-label="Previous page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
-                className="p-1 hover:text-white rounded bg-slate-900 border border-slate-800 transition-colors"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center p-1 hover:text-white rounded bg-slate-900 border border-slate-800 transition-colors"
+                aria-label="Next page"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -108,8 +110,8 @@ export function LogsTable({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto -mx-1 sm:mx-0">
+          <table className="w-full min-w-[700px] text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-[11px] text-slate-400 font-medium pb-2">
                 <th className="pb-2.5 w-7">

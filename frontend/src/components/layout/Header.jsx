@@ -134,14 +134,14 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
   const isLight = appearance?.theme === 'Light';
 
   return (
-    <header className="h-16 px-3 sm:px-6 md:px-8 border-b border-[#26131c] bg-[#0b080e]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-30 transition-colors gap-2 sm:gap-4">
+    <header className="h-16 px-3 sm:px-6 md:px-8 border-b border-[#26131c] bg-[#0b080e]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-30 transition-colors gap-2 sm:gap-4 w-full max-w-full">
       {/* Search Bar matching wireframe with mobile menu toggle */}
-      <div className="flex items-center gap-2 flex-1 max-w-md min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-1 max-w-md min-w-0">
         {onOpenMobileSidebar && (
           <button
             type="button"
             onClick={onOpenMobileSidebar}
-            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 transition-colors shrink-0 cursor-pointer"
+            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 transition-colors shrink-0 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95"
             aria-label="Open mobile navigation menu"
             title="Open Menu"
           >
@@ -151,7 +151,7 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
 
         <div
           onClick={onOpenSearch}
-          className="flex-1 flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-400 cursor-pointer transition-all shadow-inner group min-w-0"
+          className="flex-1 flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-400 cursor-pointer transition-all shadow-inner group min-w-0 min-h-[40px]"
         >
           <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-hover:text-rose-300 shrink-0" />
           <span className="text-xs text-slate-400 group-hover:text-rose-200 truncate select-none">
@@ -165,13 +165,13 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
       </div>
 
       {/* Right User Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
         {/* Quick Theme Toggle */}
         <button
           type="button"
           onClick={handleToggleTheme}
           aria-label={isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer flex items-center justify-center border border-transparent hover:border-slate-700/60"
+          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer flex items-center justify-center border border-transparent hover:border-slate-700/60 min-h-[40px] min-w-[40px] active:scale-95"
           title={isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
         >
           {isLight ? (
@@ -185,7 +185,7 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotifOpen(!notifOpen)}
-            className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a0e1c] transition-colors cursor-pointer"
+            className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a0e1c] transition-colors cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95"
             title="Notifications"
           >
             <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -198,8 +198,8 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black z-50 overflow-hidden animate-fade-in">
-              <div className="p-3.5 border-b border-[#2c1622] flex items-center justify-between bg-[#0e0710]/90">
+            <div className="absolute right-0 mt-2 w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black z-50 overflow-hidden animate-fade-in max-h-[80vh] flex flex-col">
+              <div className="p-3.5 border-b border-[#2c1622] flex items-center justify-between bg-[#0e0710]/90 shrink-0">
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs font-bold text-white tracking-tight">Security Notifications</h3>
                   {unreadCount > 0 && (
@@ -308,15 +308,15 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
         <div className="relative" ref={profileRef}>
           <div
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-3 pl-2 border-l border-[#26131c] cursor-pointer select-none group"
+            className="flex items-center gap-2 sm:gap-3 pl-1.5 sm:pl-2 border-l border-[#26131c] cursor-pointer select-none group min-h-[40px] active:scale-95"
           >
             <div
               suppressHydrationWarning
-              className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#be123c] to-[#6a1a24] flex items-center justify-center text-xs font-bold text-white shadow-md shadow-rose-950/40 group-hover:ring-2 group-hover:ring-rose-500/50 transition-all select-none"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#be123c] to-[#6a1a24] flex items-center justify-center text-xs font-bold text-white shadow-md shadow-rose-950/40 group-hover:ring-2 group-hover:ring-rose-500/50 transition-all select-none shrink-0"
             >
               {initials || <User className="w-4 h-4 text-white/80" />}
             </div>
-            <div className="flex flex-col text-left">
+            <div className="hidden md:flex flex-col text-left">
               <span suppressHydrationWarning className="text-xs font-semibold text-slate-200 group-hover:text-white leading-tight">
                 {displayName || 'Account'}
               </span>
@@ -326,11 +326,11 @@ export function Header({ onOpenSearch, onOpenMobileSidebar }) {
                 </span>
               )}
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-transform" />
+            <ChevronDown className="hidden md:block w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-transform" />
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black py-1.5 z-40 animate-fade-in">
+            <div className="absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[#130a15] border border-[#2c1622] shadow-2xl shadow-black py-1.5 z-40 animate-fade-in max-h-[85vh] overflow-y-auto">
               <div className="px-3.5 py-2.5 border-b border-[#2c1622] text-xs">
                 <span className="text-slate-400 block text-[10px]">Signed in as</span>
                 <span className="text-white font-semibold truncate block mt-0.5">

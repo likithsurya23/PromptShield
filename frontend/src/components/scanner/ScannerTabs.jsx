@@ -19,16 +19,16 @@ export function ScannerTabs({ result }) {
   const isBlock = result.action === 'BLOCK';
 
   return (
-    <Card className="p-6 border-slate-800/80 bg-[#0c1222]/80 shadow-xl mb-5">
+    <Card className="p-4 sm:p-5 md:p-6 border-slate-800/80 bg-[#0c1222]/80 shadow-xl mb-5">
       {/* Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 mb-5 overflow-x-auto">
+      <div className="flex items-center gap-1.5 sm:gap-2 border-b border-slate-800 pb-3 mb-5 overflow-x-auto no-scrollbar -mx-1 px-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`min-h-[38px] px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                 isActive
                   ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -148,9 +148,9 @@ export function ScannerTabs({ result }) {
           </div>
           {result.matched_rules?.length ? (
             result.matched_rules.map((rule, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                <span className="text-xs font-mono text-slate-200">{rule}</span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
+              <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="text-xs font-mono text-slate-200 break-words">{rule}</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 self-start sm:self-auto shrink-0">
                   Critical Signature
                 </span>
               </div>

@@ -74,7 +74,7 @@ export function ApiKeysTable({
   };
 
   return (
-    <Card className="p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">
+    <Card className="p-3.5 sm:p-5 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between h-full">
       <div>
         {/* Header & Search */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -95,8 +95,8 @@ export function ApiKeysTable({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="overflow-x-auto -mx-1 sm:mx-0">
+          <table className="w-full min-w-[620px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-[11px] text-slate-400 font-medium">
                 <th className="pb-2.5">Name</th>

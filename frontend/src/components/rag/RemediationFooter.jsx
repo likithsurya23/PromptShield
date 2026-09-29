@@ -32,12 +32,12 @@ export function RemediationFooter({
       <Card className="lg:col-span-6 p-4 border-slate-800/80 bg-[#0c1222]/80 shadow-xl flex flex-col justify-between">
         <h3 className="text-xs font-bold text-white mb-2.5">Recommended Actions</h3>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           {/* Remove Flagged Content */}
           <button
             type="button"
             onClick={onSanitize}
-            className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+            className="min-h-[38px] flex-1 sm:flex-initial flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
           >
             {sanitized ? <Check className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
             <span>{sanitized ? 'Content Redacted' : 'Remove Flagged Content'}</span>
@@ -47,7 +47,7 @@ export function RemediationFooter({
           <button
             type="button"
             onClick={onDownloadReport}
-            className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+            className="min-h-[38px] flex-1 sm:flex-initial flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Download Report</span>
@@ -57,7 +57,7 @@ export function RemediationFooter({
           <button
             type="button"
             onClick={onRescan}
-            className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+            className="min-h-[38px] flex-1 sm:flex-initial flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Re-scan</span>

@@ -28,7 +28,7 @@ export function ScannerResult({ result, loading, error }) {
         <h3 className="text-base font-semibold text-white mb-1">Inference Service Unavailable</h3>
         <p className="text-xs text-rose-300/80 max-w-sm mb-3">{error}</p>
         <p className="text-[11px] text-slate-400">
-          Ensure FastAPI backend is running on <code className="text-[#f57b83]">http://localhost:8000</code>
+          Ensure FastAPI backend is running.
         </p>
       </Card>
     );
@@ -93,24 +93,24 @@ export function ScannerResult({ result, loading, error }) {
   const BannerIcon = banner.icon;
 
   return (
-    <Card className="flex flex-col justify-between p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
+    <Card className="flex flex-col justify-between p-4 sm:p-6 h-full border-[#2c1622] bg-[#120a14]/85 shadow-xl">
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
           <h2 className="text-sm font-semibold text-white">2. Scan Result</h2>
-          <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-400 font-mono">
+            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span>Scanned at {result.timestamp}</span>
           </div>
         </div>
 
         {/* Big Status Banner */}
-        <div className={`p-4 rounded-xl border ${banner.bg} flex items-start gap-4 mb-4 transition-all`}>
-          <div className={`p-2.5 rounded-xl border ${banner.iconBg} shrink-0 mt-0.5`}>
-            <BannerIcon className="w-6 h-6" />
+        <div className={`p-3.5 sm:p-4 rounded-xl border ${banner.bg} flex items-start gap-3 sm:gap-4 mb-4 transition-all`}>
+          <div className={`p-2 sm:p-2.5 rounded-xl border ${banner.iconBg} shrink-0 mt-0.5`}>
+            <BannerIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div>
-            <div className={`text-xl font-bold tracking-tight ${banner.titleColor}`}>
+          <div className="min-w-0">
+            <div className={`text-lg sm:text-xl font-bold tracking-tight ${banner.titleColor}`}>
               {banner.title}
             </div>
             <div className="text-xs font-semibold text-white mt-0.5">
@@ -225,7 +225,7 @@ export function ScannerResult({ result, loading, error }) {
             <ul className="space-y-1 text-xs text-slate-300 list-disc list-inside">
               {result.matched_rules && result.matched_rules.length > 0 ? (
                 result.matched_rules.map((rule, i) => (
-                  <li key={i} className="text-slate-300 text-[11px] truncate">
+                  <li key={i} className="text-slate-300 text-[11px] break-words">
                     {rule}
                   </li>
                 ))

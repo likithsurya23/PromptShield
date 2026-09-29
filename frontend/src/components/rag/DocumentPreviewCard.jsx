@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Minus, Plus, Search, ShieldAlert, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Minus, Plus, Search, ShieldAlert, AlertTriangle } from 'lucide-react';
 
 export function DocumentPreviewCard({ selectedChunk, sanitized = false }) {
   const [activeTab, setActiveTab] = useState('flagged');

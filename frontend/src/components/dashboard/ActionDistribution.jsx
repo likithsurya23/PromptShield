@@ -83,33 +83,33 @@ export function ActionDistribution({ data }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 text-xs w-full sm:w-auto">
-          <div className="flex items-start gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-0.5 shrink-0" />
+        <div className="grid grid-cols-3 sm:flex sm:flex-col gap-2 sm:gap-3 text-xs w-full sm:w-auto pt-2 sm:pt-0 border-t border-slate-800/60 sm:border-0">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1.5 sm:gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-0 sm:mt-0.5 shrink-0" />
             <div className="flex flex-col">
               <span className="text-slate-200 font-medium">Allowed</span>
               <span className="text-[11px] text-slate-400">
-                {data.allowed.percentage}% ({data.allowed.count.toLocaleString()})
+                {data.allowed.percentage}% <span className="hidden sm:inline">({data.allowed.count.toLocaleString()})</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-0.5 shrink-0" />
+          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1.5 sm:gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-0 sm:mt-0.5 shrink-0" />
             <div className="flex flex-col">
               <span className="text-slate-200 font-medium">Warned</span>
               <span className="text-[11px] text-slate-400">
-                {data.warned.percentage}% ({data.warned.count.toLocaleString()})
+                {data.warned.percentage}% <span className="hidden sm:inline">({data.warned.count.toLocaleString()})</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 mt-0.5 shrink-0" />
+          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1.5 sm:gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 mt-0 sm:mt-0.5 shrink-0" />
             <div className="flex flex-col">
               <span className="text-slate-200 font-medium">Blocked</span>
               <span className="text-[11px] text-slate-400">
-                {data.blocked.percentage}% ({data.blocked.count.toLocaleString()})
+                {data.blocked.percentage}% <span className="hidden sm:inline">({data.blocked.count.toLocaleString()})</span>
               </span>
             </div>
           </div>

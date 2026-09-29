@@ -12,12 +12,9 @@ export function ApiKeysHeader() {
           <Key className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             API Keys
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Manage your API keys for LLM providers and external services securely.
-          </p>
         </div>
       </div>
 

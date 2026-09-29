@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Lock, Save, CheckCircle2, Shield, X, Eye, EyeOff, User } from 'lucide-react';
+import { Lock, Save, CheckCircle2, X, Eye, EyeOff } from 'lucide-react';
 
 export function ProfileCard({
   profile,
@@ -21,12 +21,12 @@ export function ProfileCard({
   const displayUser = profile?.username || profile?.name || '';
   const initials = displayUser
     ? displayUser
-        .split(' ')
-        .filter(Boolean)
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+      .split(' ')
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
     : '';
 
   const handlePasswordSubmit = async (e) => {
@@ -68,26 +68,12 @@ export function ProfileCard({
       <div>
         <div className="flex items-center justify-between mb-0.5">
           <h2 className="text-sm font-bold text-white tracking-tight">Profile</h2>
-          {profile?.role && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#1a0e1c] text-[#f57b83] border border-rose-500/25">
-              <Shield className="w-3 h-3" />
-              <span>{profile.role}</span>
-            </span>
-          )}
         </div>
         <p className="text-xs text-slate-400 mb-5">
-          View and update your personal information and authentication credentials.
+          View and update your personal information.
         </p>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-5">
-          {/* Large Avatar */}
-          <div
-            suppressHydrationWarning
-            className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#be123c] via-[#e11d48] to-[#6a1a24] text-white font-bold text-xl flex items-center justify-center shadow-lg shadow-rose-950/40 shrink-0 select-none border border-rose-500/30"
-          >
-            {initials || <User className="w-8 h-8 text-white/80" />}
-          </div>
-
           <div className="flex-1 space-y-3 w-full">
             {/* Username */}
             <div>
@@ -123,40 +109,41 @@ export function ProfileCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[#2c1622]">
+        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#2c1622] w-full">
           <button
             type="button"
             onClick={onSaveProfile}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all active:scale-95 cursor-pointer"
+            className="w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-[#f43f5e] via-[#e11d48] to-[#881337] hover:opacity-95 text-white text-[11px] sm:text-xs font-semibold shadow-lg shadow-rose-950/40 transition-all active:scale-95 cursor-pointer"
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>Save Profile</span>
+            <Save className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Save Profile</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsPasswordModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer"
+            className="w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2 rounded-xl bg-[#140c17] border border-[#2c1622] hover:border-rose-500/40 text-slate-300 hover:text-white text-[11px] sm:text-xs font-semibold transition-all active:scale-95 cursor-pointer"
           >
-            <Lock className="w-3.5 h-3.5 text-slate-400" />
-            <span>Change Password</span>
+            <Lock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="truncate">Change Password</span>
           </button>
         </div>
       </div>
 
       {/* Change Password Modal */}
       {isPasswordModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md bg-[#130a15] border border-[#2c1622] rounded-2xl shadow-2xl p-6 text-left relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-[#130a15] border border-[#2c1622] rounded-2xl shadow-2xl p-4 sm:p-6 text-left relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsPasswordModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1f0f1f] transition-colors"
+              className="absolute top-3.5 right-3.5 text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-[#1f0f1f] transition-colors"
+              aria-label="Close"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-[#1a0e1c] border border-rose-500/25 text-[#f57b83] flex items-center justify-center">
+            <div className="flex items-center gap-3 mb-4 pr-8">
+              <div className="w-9 h-9 rounded-xl bg-[#1a0e1c] border border-rose-500/25 text-[#f57b83] flex items-center justify-center shrink-0">
                 <Lock className="w-4 h-4" />
               </div>
               <div>
@@ -228,17 +215,17 @@ export function ProfileCard({
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-2.5 pt-3">
+                <div className="grid grid-cols-2 gap-2 pt-3 w-full">
                   <button
                     type="button"
                     onClick={() => setIsPasswordModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors"
+                    className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-4 py-2 rounded-xl bg-[#080d19] border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors shadow-md shadow-blue-600/30"
+                    className="w-full min-h-[40px] flex items-center justify-center px-2 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors shadow-md shadow-blue-600/30"
                   >
                     Update Password
                   </button>

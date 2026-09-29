@@ -211,9 +211,6 @@ export default function RagSecurityPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               RAG Document Security
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Analyze ingested knowledge bases, docs, and embeddings for indirect prompt injection vectors.
-            </p>
           </div>
         </div>
 

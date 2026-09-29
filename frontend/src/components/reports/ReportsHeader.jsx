@@ -12,12 +12,9 @@ export function ReportsHeader({ onOpenGenerateModal }) {
           <FileText className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             Reports
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Generate detailed reports on security scans, threats, model usage, and system activity.
-          </p>
         </div>
       </div>
 
