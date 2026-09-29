@@ -48,14 +48,6 @@ export function HeroSection() {
           
           {/* Left Column: Headline, Pill, Subtitle, CTA buttons */}
           <div className="lg:col-span-6 space-y-4 sm:space-y-6 text-left">
-            {/* Pill Tag: AI SECURITY FOR A SAFER TOMORROW */}
-            <div>
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-500/30 bg-[#1e0a14]/85 text-[#f57b83] text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(244,63,94,0.15)]">
-                <span className="w-2 h-2 rounded-full bg-[#f43f5e] shadow-[0_0_8px_#f43f5e] animate-pulse" />
-                <span>AI SECURITY FOR A SAFER TOMORROW</span>
-              </span>
-            </div>
-
             {/* Headline matching image exactly */}
             <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12] break-words">
               Stop Prompt Injection<br className="hidden sm:inline" />
