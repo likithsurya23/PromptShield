@@ -9,26 +9,32 @@ def client():
         yield test_client
 
 
+import uuid
+
+TEST_USER = f"analyst_{uuid.uuid4().hex[:6]}"
+TEST_EMAIL = f"{TEST_USER}@promptshield.io"
+
+
 def test_auth_registration(client):
     """Test registering a new user."""
     payload = {
-        "username": "security_analyst",
-        "email": "analyst@promptshield.io",
+        "username": TEST_USER,
+        "email": TEST_EMAIL,
         "password": "SecurePassword999!"
     }
     response = client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 201
     data = response.json()
-    assert data["username"] == "security_analyst"
-    assert data["email"] == "analyst@promptshield.io"
+    assert data["username"] == TEST_USER
+    assert data["email"] == TEST_EMAIL
     assert "password" not in data
 
 
 def test_auth_duplicate_registration(client):
     """Test duplicate registration is rejected."""
     payload = {
-        "username": "security_analyst",
-        "email": "analyst@promptshield.io",
+        "username": TEST_USER,
+        "email": TEST_EMAIL,
         "password": "AnotherPassword123!"
     }
     response = client.post("/api/v1/auth/register", json=payload)

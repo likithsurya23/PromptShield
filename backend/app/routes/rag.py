@@ -49,10 +49,10 @@ class RagSanitizeRequest(BaseModel):
 
 def get_scanner(request: Request) -> PromptScanner:
     scanner = getattr(request.app.state, "scanner", None)
-    if scanner is None or scanner.ml_detector is None:
+    if scanner is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="PromptShield security engine / ML model is not loaded yet."
+            detail="PromptShield security engine is not initialized yet."
         )
     return scanner
 
