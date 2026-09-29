@@ -17,8 +17,17 @@ class RuleDetector:
         if rules_path:
             self.rules_path = Path(rules_path)
         else:
-            backend_dir = Path(__file__).resolve().parent.parent.parent
-            self.rules_path = backend_dir / "rules" / "rules.json"
+            app_dir = Path(__file__).resolve().parent.parent
+            backend_dir = app_dir.parent
+            candidates = [
+                app_dir / "rules" / "rules.json",
+                backend_dir / "rules" / "rules.json",
+            ]
+            self.rules_path = candidates[0]
+            for candidate in candidates:
+                if candidate.exists():
+                    self.rules_path = candidate
+                    break
 
         self.rules: Dict[str, List[str]] = {}
         self.compiled_rules: Dict[str, List[re.Pattern]] = {}

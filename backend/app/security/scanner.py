@@ -36,11 +36,8 @@ class PromptScanner:
         """
         Execute full security scan for a single prompt with customizable mode and thresholds.
         """
-        if self.ml_detector is None:
-            raise RuntimeError("ML Detector is not loaded in PromptScanner.")
-
         # 1. ML Detector
-        if ml_detection:
+        if ml_detection and self.ml_detector is not None:
             ml_result = self.ml_detector.predict(prompt)
             ml_malicious_score = ml_result["malicious_probability"]
             prediction = ml_result["prediction"]
@@ -50,17 +47,20 @@ class PromptScanner:
         else:
             ml_malicious_score = 0.0
             prediction = "benign"
-            confidence = 1.0
-            benign_prob = 1.0
-            malicious_prob = 0.0
+            confidence = 1.0 if not ml_detection else 0.5
+            benign_prob = 1.0 if not ml_detection else 0.5
+            malicious_prob = 0.0 if not ml_detection else 0.5
 
         # 2. Rule Detector
         if rule_detection:
             rule_result = self.rule_detector.detect(prompt)
             attack_categories = rule_result["attack_categories"]
             matched_rules = rule_result.get("matched_rules", [])
-            if not ml_detection and attack_categories:
+            if (not ml_detection or self.ml_detector is None) and attack_categories:
                 prediction = "malicious"
+                confidence = 0.95
+                malicious_prob = 0.95
+                benign_prob = 0.05
         else:
             attack_categories = []
             matched_rules = []

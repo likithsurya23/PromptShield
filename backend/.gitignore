@@ -29,8 +29,11 @@ htmlcov/
 
 # ML Datasets, Checkpoints & Benchmark Logs (>50MB/100MB)
 ml/checkpoints/
+app/ml/checkpoints/
 ml/datasets/
+app/ml/datasets/
 ml/results/
+app/ml/results/
 *.csv
 
 # Virtual Environments

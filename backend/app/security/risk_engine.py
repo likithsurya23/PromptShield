@@ -18,8 +18,17 @@ class RiskEngine:
         if severity_path:
             self.severity_path = Path(severity_path)
         else:
-            backend_dir = Path(__file__).resolve().parent.parent.parent
-            self.severity_path = backend_dir / "rules" / "category_severity.json"
+            app_dir = Path(__file__).resolve().parent.parent
+            backend_dir = app_dir.parent
+            candidates = [
+                app_dir / "rules" / "category_severity.json",
+                backend_dir / "rules" / "category_severity.json",
+            ]
+            self.severity_path = candidates[0]
+            for candidate in candidates:
+                if candidate.exists():
+                    self.severity_path = candidate
+                    break
 
         self.category_severity: Dict[str, float] = self._load_severity()
 
